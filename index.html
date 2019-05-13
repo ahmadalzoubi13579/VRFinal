@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Cloth Simulation</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="./assets/style.css">
+	</head>
+
+	<body>
+		
+		<div id="info">Cloth Simulator<br/>
+			<a onclick="wireFrame();">Wireframe</a> |
+			<a onclick="restartCloth();">Restart</a>
+		</div>
+
+
+
+		<script src="libs/three.min.js"></script>
+
+		<script src="libs/Detector.js"></script>
+		<script src="libs/TrackballControls.js"></script>
+
+		<script src="libs/stats.min.js"></script>
+		<script src="libs/dat.gui.min.js"></script>
+
+
+		<!-- <script src="js/clothphysics.js"></script>
+        <script src = "js/drape.js"></script> -->
+        <script src="./Particle.js"></script>
+        <script src="./index.js"></script>
+
+		<!-- <script type="x-shader/x-fragment" id="fragmentShaderDepth">
+
+			uniform sampler2D texture;
+			varying vec2 vUV;
+
+			vec4 pack_depth( const in float depth ) {
+
+				const vec4 bit_shift = vec4( 256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0 );
+				const vec4 bit_mask  = vec4( 0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0 );
+				vec4 res = fract( depth * bit_shift );
+				res -= res.xxyz * bit_mask;
+				return res;
+
+			}
+
+			void main() {
+
+				vec4 pixel = texture2D( texture, vUV );
+
+				if ( pixel.a < 0.5 ) discard;
+
+				gl_FragData[ 0 ] = pack_depth( gl_FragCoord.z );
+
+			}
+		</script>
+
+		<script type="x-shader/x-vertex" id="vertexShaderDepth">
+
+			varying vec2 vUV;
+
+			void main() {
+
+				vUV = 0.75 * uv;
+
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script> -->
+
+		
+	</body>
+</html>
