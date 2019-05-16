@@ -64,12 +64,11 @@ var guiEnabled = true;
 
 //////////////////////////////////////////////////////////////////////////////
 
-////////// hello world ///////////
 
 //////////// hello world 2 /////////////
 
 function setup() {
-
+    // stats
     stats = new Stats();
     document.body.appendChild(stats.domElement);
 
