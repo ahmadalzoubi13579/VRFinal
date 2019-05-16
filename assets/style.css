@@ -1,5 +1,6 @@
 body {
-    font-family: 'Comic Sans MS';
+    font-family: 'Montserrat', sans-serif;
+    /* font-size: 10; */
     background-color: #000;
     color: #000;
     margin: 0px;
@@ -13,6 +14,7 @@ body {
     width: 100%;
     text-align: center;
 }
+
 
 a {
     text-decoration: none;

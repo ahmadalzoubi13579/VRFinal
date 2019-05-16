@@ -216,26 +216,26 @@ function setup() {
 
         var f4 = gui.addFolder('Interaction')
 
-        f4.add(guiControls, 'rotate').name('auto rotate').onChange(function (value) { rotate = value; });
-        f4.add(guiControls, 'wind').name('wind').onChange(function (value) { wind = value; });
+        f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
+        f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
         // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
-        f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('pinned').onChange(function (value) { pinCloth(value); });
+        f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
         var f1 = gui.addFolder('Behavior');
 
         f1.add(guiControls, 'structuralSprings').name('Structural Springs').onChange(function (value) { structuralSprings = value; restartCloth(); });
         f1.add(guiControls, 'shearSprings').name('Shear Springs').onChange(function (value) { shearSprings = value; restartCloth(); });
         f1.add(guiControls, 'bendingSprings').name('Bending Springs').onChange(function (value) { bendingSprings = value; restartCloth(); });
-        f1.add(guiControls, 'friction', 0, 1).onChange(function (value) { friction = value; });
+        f1.add(guiControls, 'friction', 0, 1).name('Friction').onChange(function (value) { friction = value; });
         f1.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
         //f1.add(guiControls, 'weight', 0, 500).step(1).onChange(function(value){weight = value; restartCloth();});
 
         var f3 = gui.addFolder('Appearance');
-        f3.addColor(guiControls, 'clothColor').name('cloth color').onChange(function (value) { clothMaterial.color.setHex(value); });
-        f3.addColor(guiControls, 'clothSpecular').name('cloth reflection').onChange(function (value) { clothMaterial.specular.setHex(value); });
-        f3.addColor(guiControls, 'groundColor').name('ground color').onChange(function (value) { groundMaterial.color.setHex(value); });
-        f3.addColor(guiControls, 'groundSpecular').name('gnd reflection').onChange(function (value) { groundMaterial.specular.setHex(value); });
-        f3.addColor(guiControls, 'fogColor').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
+        f3.addColor(guiControls, 'clothColor').name('Cloth Color').onChange(function (value) { clothMaterial.color.setHex(value); });
+        f3.addColor(guiControls, 'clothSpecular').name('Cloth Reflection').onChange(function (value) { clothMaterial.specular.setHex(value); });
+        f3.addColor(guiControls, 'groundColor').name('Ground Color').onChange(function (value) { groundMaterial.color.setHex(value); });
+        f3.addColor(guiControls, 'groundSpecular').name('Ground Reflection').onChange(function (value) { groundMaterial.specular.setHex(value); });
+        f3.addColor(guiControls, 'fogColor').name('Fog Color').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
 
     }
 

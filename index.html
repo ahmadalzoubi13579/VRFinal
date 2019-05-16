@@ -5,14 +5,18 @@
 		<title>Cloth Simulation</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="./assets/bootstrap.min.css">
 		<link rel="stylesheet" href="./assets/style.css">
 	</head>
 
 	<body>
+
 		
-		<div id="info">Cloth Simulation<br/>
-			<a onclick="wireFrame();">Wireframe</a> |
-			<a onclick="restartCloth();">Restart</a>
+		
+		<div id="info">
+			<h1>Cloth Simulation</h1>
+			<button class="btn btn-outline-primary btn-sm" onclick="wireFrame();">Wireframe</button>
+			<button class="btn btn-outline-primary btn-sm" onclick="restartCloth();">Restart</button>
 		</div>
 
 		<script src="libs/three.min.js"></script>
