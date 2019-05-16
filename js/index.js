@@ -5,15 +5,15 @@ var scene
 var camera, light, clothObject
 var loader, clothTexture, clothMaterial, clothGeometry
 var cloth
-var clothWidth = 40
-var clothHeight = 40
+var fabricLength = 500;
+var clothWidth = Math.round(fabricLength / 20)
+var clothHeight = Math.round(fabricLength / 20)
 var particles = [];
-var fabricLength = 400; // sets the size of the cloth
 var restDistanceB = 2;
 var restDistanceS = Math.sqrt(2);
 var restDistance; // = fabricLength/clothWidth;
 var structuralSprings = true;
-var shearSprings = false;
+var shearSprings = true;
 var bendingSprings = true;
 var DAMPING = 0.03;
 var DRAG = 1 - DAMPING;
@@ -29,14 +29,19 @@ var rotate = false;
 var pinned = 'Corners';
 var thing = 'Ball'
 var cornersPinned, oneEdgePinned, twoEdgesPinned, fourEdgesPinned, randomEdgesPinned;
-var avoidClothSelfIntersection = false;
+var avoidClothSelfIntersection = true;
 var friction = 0.9; // similar to coefficient of friction. 0 = frictionless, 1 = cloth sticks in place
 var tmpForce = new THREE.Vector3();
 var diff = new THREE.Vector3();
 var randomPoints = [];
 var rand, randX, randY;
 var pos;
+var gui;
+var guiControls;
 var guiEnabled = true;
+var groundTexture
+var groundMaterial
+var mesh
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -111,11 +116,36 @@ function setup() {
     // scene.background = new THREE.Color(0x343434);
 
 
+    // ground
+
+    loader = new THREE.TextureLoader();
+
+    // needed for ground texture
+    groundTexture = loader.load("assets/terrain/backgrounddetailed6.jpg");
+    groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+    groundTexture.repeat.set(25, 25);
+    groundTexture.anisotropy = 16;
+
+
+    // ground material
+    groundMaterial = new THREE.MeshPhongMaterial(
+        {
+            color: 0x404761,//0x3c3c3c,
+            specular: 0x404761,//0x3c3c3c//,
+            map: groundTexture
+        });
+
+    // ground mesh
+    mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(20000, 20000), groundMaterial);
+    mesh.position.y = -250;
+    mesh.rotation.x = - Math.PI / 2;
+    mesh.receiveShadow = true;
+    scene.add(mesh); // add ground to scene
 
 
     // console.log(scene)
 
-    loader = new THREE.TextureLoader();
+
     clothTexture = loader.load("assets/patterns/bright_squares256.png");
     clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
     clothTexture.anisotropy = 16;
@@ -136,17 +166,78 @@ function setup() {
     clothGeometry = new THREE.ParametricGeometry(clothInitialPosition, clothWidth, clothHeight);
     clothGeometry.dynamic = true;
 
-
-
-
     clothObject = new THREE.Mesh(clothGeometry, clothMaterial);
+    clothObject.castShadow = true;
     clothObject.position.set(0, 0, 0);
     scene.add(clothObject)
 
     document.body.appendChild(renderer.domElement);
 
+    window.addEventListener( 'resize', onWindowResize, false );
+
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
     pinCloth('OneEdge');
+
+    if (guiEnabled) {
+
+        guiControls = new function () {
+            this.friction = friction;
+            this.particles = clothWidth;
+            this.rotate = rotate;
+
+            this.wind = wind;
+            this.thing = thing;
+            this.pinned = pinned;
+
+            this.avoidClothSelfIntersection = avoidClothSelfIntersection;
+
+            this.fabricLength = fabricLength;
+            this.structuralSprings = structuralSprings;
+
+            this.bendingSprings = bendingSprings;
+            this.bendingSpringLengthMultiplier = restDistanceB;
+
+            this.shearSprings = shearSprings;
+            this.shearSpringLengthMultiplier = restDistanceS;
+
+            this.clothColor = 0xaa2929;
+            this.clothSpecular = 0x030303;
+
+            this.groundColor = 0x404761;
+            this.groundSpecular = 0x404761;
+
+            this.fogColor = 0xcce0ff;
+
+        };
+
+        gui = new dat.GUI();
+
+        var f0 = gui.add(guiControls, 'fabricLength', 200, 1000).step(20).name('Size').onChange(function (value) { fabricLength = value; clothWidth = Math.round(value / 20); clothHeight = Math.round(value / 20); restartCloth(); });
+
+        var f4 = gui.addFolder('Interaction')
+
+        f4.add(guiControls, 'rotate').name('auto rotate').onChange(function (value) { rotate = value; });
+        f4.add(guiControls, 'wind').name('wind').onChange(function (value) { wind = value; });
+        // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
+        f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('pinned').onChange(function (value) { pinCloth(value); });
+
+        var f1 = gui.addFolder('Behavior');
+
+        f1.add(guiControls, 'structuralSprings').name('Structural Springs').onChange(function (value) { structuralSprings = value; restartCloth(); });
+        f1.add(guiControls, 'shearSprings').name('Shear Springs').onChange(function (value) { shearSprings = value; restartCloth(); });
+        f1.add(guiControls, 'bendingSprings').name('Bending Springs').onChange(function (value) { bendingSprings = value; restartCloth(); });
+        f1.add(guiControls, 'friction', 0, 1).onChange(function (value) { friction = value; });
+        f1.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
+        //f1.add(guiControls, 'weight', 0, 500).step(1).onChange(function(value){weight = value; restartCloth();});
+
+        var f3 = gui.addFolder('Appearance');
+        f3.addColor(guiControls, 'clothColor').name('cloth color').onChange(function (value) { clothMaterial.color.setHex(value); });
+        f3.addColor(guiControls, 'clothSpecular').name('cloth reflection').onChange(function (value) { clothMaterial.specular.setHex(value); });
+        f3.addColor(guiControls, 'groundColor').name('ground color').onChange(function (value) { groundMaterial.color.setHex(value); });
+        f3.addColor(guiControls, 'groundSpecular').name('gnd reflection').onChange(function (value) { groundMaterial.specular.setHex(value); });
+        f3.addColor(guiControls, 'fogColor').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
+
+    }
 
 }
 
@@ -201,7 +292,7 @@ function pinCloth(choice) {
         randomPoints = [];
         for (u = 0; u < rand; u++) {
             randX = Math.round(Math.random() * clothWidth);
-            randY = Math.round(Math.random() * ySegs);
+            randY = Math.round(Math.random() * clothHeight);
             randomPoints.push([randX, randY]);
         }
     }
@@ -238,13 +329,13 @@ function restartCloth() {
     scene.add(clothObject); // adds the cloth to the scene
 }
 
-function wireFrame(){
+function wireFrame() {
 
     // poleMat.wireframe = !poleMat.wireframe;
     clothMaterial.wireframe = !clothMaterial.wireframe;
     // ballMaterial.wireframe = !ballMaterial.wireframe;
-  
-  }
+
+}
 
 function render() {
     var timer = Date.now() * 0.0002;
@@ -333,23 +424,23 @@ function simulate(time) {
         if (pos.y < - 249) { pos.y = - 249; }
     }
 
-    if(avoidClothSelfIntersection){
-        for ( i = 0; i < particles.length; i ++ ){
-          p_i = particles[i];
-          for ( j = 0; j < particles.length; j ++ ){
-            p_j = particles[j];
-            cloth.repelParticles(p_i,p_j,restDistance);
-          }
+    if (avoidClothSelfIntersection) {
+        for (i = 0; i < particles.length; i++) {
+            p_i = particles[i];
+            for (j = 0; j < particles.length; j++) {
+                p_j = particles[j];
+                cloth.repelParticles(p_i, p_j, restDistance);
+            }
         }
-      }
+    }
 
     // Pin Constrains
     if (cornersPinned) {
         // could also do particles[blah].lock() which will lock particles to wherever they are, not to their original position
         particles[cloth.index(0, 0)].lockToOriginal();
         particles[cloth.index(clothWidth, 0)].lockToOriginal();
-        particles[cloth.index(0, ySegs)].lockToOriginal();
-        particles[cloth.index(clothWidth, ySegs)].lockToOriginal();
+        particles[cloth.index(0, clothHeight)].lockToOriginal();
+        particles[cloth.index(clothWidth, clothHeight)].lockToOriginal();
     }
 
     else if (oneEdgePinned) {

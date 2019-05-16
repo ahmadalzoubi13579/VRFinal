@@ -1,9 +1,10 @@
 body {
-    font-family: Monospace;
+    font-family: 'Comic Sans MS';
     background-color: #000;
     color: #000;
     margin: 0px;
     overflow: hidden;
+    
 }
 
 #info {
@@ -13,18 +14,8 @@ body {
     text-align: center;
 }
 
-#corner {
-    position: absolute;
-    padding: 10px;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    text-align: right;
-}
-
-
 a {
-    text-decoration: underline;
+    text-decoration: none;
     cursor: pointer;
 }
 
