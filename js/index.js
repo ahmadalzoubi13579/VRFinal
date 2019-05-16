@@ -1,11 +1,13 @@
-// global variables 
+if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+// global variables
 var stats
 var renderer
 var scene
 var camera, light, clothObject
 var loader, clothTexture, clothMaterial, clothGeometry
 var cloth
-var fabricLength = 500;
+var fabricLength = 400;
 var clothWidth = Math.round(fabricLength / 20)
 var clothHeight = Math.round(fabricLength / 20)
 var particles = [];
@@ -42,6 +44,11 @@ var guiEnabled = true;
 var groundTexture
 var groundMaterial
 var mesh
+var poleGeo
+var poleMat
+var poleRight
+var poleLeft
+var showPoles = true
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +78,7 @@ var mesh
 
 
 function setup() {
+
     // stats
     stats = new Stats();
     document.body.appendChild(stats.domElement);
@@ -84,7 +92,6 @@ function setup() {
     scene.add(camera);
 
     // light
-
     scene.add(new THREE.AmbientLight(0x666666));
     light = new THREE.DirectionalLight(0xdfebff, 1.75);
     light.position.set(50, 200, 100);
@@ -94,7 +101,7 @@ function setup() {
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
 
-    var d = 300;
+    var d = 500;
     light.shadow.camera.left = -d;
     light.shadow.camera.right = d;
     light.shadow.camera.top = d;
@@ -117,17 +124,12 @@ function setup() {
 
 
     // ground
-
     loader = new THREE.TextureLoader();
-
-    // needed for ground texture
     groundTexture = loader.load("assets/terrain/backgrounddetailed6.jpg");
     groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(25, 25);
     groundTexture.anisotropy = 16;
 
-
-    // ground material
     groundMaterial = new THREE.MeshPhongMaterial(
         {
             color: 0x404761,//0x3c3c3c,
@@ -135,24 +137,39 @@ function setup() {
             map: groundTexture
         });
 
-    // ground mesh
+
     mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(20000, 20000), groundMaterial);
     mesh.position.y = -250;
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
     scene.add(mesh); // add ground to scene
 
+    // poles
+    poleGeo = new THREE.BoxGeometry(5, 250 + 125, 5);
+    poleMat = new THREE.MeshPhongMaterial({ color: 0x595959, specular: 0x111111, shininess: 100, side: THREE.DoubleSide });
 
-    // console.log(scene)
+    poleRight = new THREE.Mesh(poleGeo, poleMat);
+    poleRight.position.x = 200;
+    poleRight.position.z = -200;
+    poleRight.position.y = -(125 - 125 / 2);
+    poleRight.receiveShadow = true;
+    poleRight.castShadow = true;
+    scene.add(poleRight);
+
+    poleLeft = new THREE.Mesh(poleGeo, poleMat);
+    poleLeft.position.x = -200;
+    poleLeft.position.z = -200;
+    poleLeft.position.y = -62;
+    poleLeft.receiveShadow = true;
+    poleLeft.castShadow = true;
+    scene.add(poleLeft);
 
 
+    // Cloth
     clothTexture = loader.load("assets/patterns/bright_squares256.png");
     clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
     clothTexture.anisotropy = 16;
 
-
-    // cloth material
-    // this tells us the material's color, how light reflects off it, etc.
 
     clothMaterial = new THREE.MeshPhongMaterial({
         color: 0x827171,
@@ -173,7 +190,7 @@ function setup() {
 
     document.body.appendChild(renderer.domElement);
 
-    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener('resize', onWindowResize, false);
 
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
     pinCloth('OneEdge');
@@ -186,6 +203,7 @@ function setup() {
             this.rotate = rotate;
 
             this.wind = wind;
+            this.showPoles = showPoles
             this.thing = thing;
             this.pinned = pinned;
 
@@ -218,6 +236,7 @@ function setup() {
 
         f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
+        f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles()});
         // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
         f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
@@ -243,7 +262,7 @@ function setup() {
 
 function clothInitialPosition(u, v) {
 
-    let width = 500, height = 500
+    let width = 400, height = 400
     let x = u * width - width / 2;
     let y = 125; //height/2;
     let z = v * height - height / 2;
@@ -327,6 +346,17 @@ function restartCloth() {
     clothObject.castShadow = true;
 
     scene.add(clothObject); // adds the cloth to the scene
+}
+
+function modifyPoles() {
+    if (showPoles) {
+        scene.add(poleLeft)
+        scene.add(poleRight)
+    }
+    else {
+        scene.remove(poleLeft)
+        scene.remove(poleRight)
+    }
 }
 
 function wireFrame() {
