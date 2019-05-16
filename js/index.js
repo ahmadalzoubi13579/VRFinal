@@ -64,9 +64,10 @@ var guiEnabled = true;
 
 //////////////////////////////////////////////////////////////////////////////
 
+////////// hello world ///////////
 
 function setup() {
-    // stats
+
     stats = new Stats();
     document.body.appendChild(stats.domElement);
 
