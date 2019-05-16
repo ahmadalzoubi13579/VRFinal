@@ -1,36 +1,43 @@
-
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>Cloth Simulation</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" href="./assets/bootstrap.min.css">
-		<link rel="stylesheet" href="./assets/style.css">
-	</head>
 
-	<body>
+<head>
+	<title>Cloth Simulation</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="stylesheet" href="./assets/bootstrap.min.css">
+	<link rel="stylesheet" href="./assets/style.css">
+</head>
 
-		
-		
-		<div id="info">
-			<h1>Cloth Simulation</h1>
-			<button class="btn btn-outline-primary btn-sm" onclick="wireFrame();">Wireframe</button>
-			<button class="btn btn-outline-primary btn-sm" onclick="restartCloth();">Restart</button>
+<body>
+
+
+
+	<div id="info">
+		<div style="display: flex; justify-content: center">
+			<h1 style="margin: 0;">Cloth Simulation</h1>
+		</div>
+		<div style="display: flex; justify-content: center;">
+			<button class="btn btn-outline-primary btn-sm" style="margin: 10px"
+				onclick="wireFrame();">Wireframe</button>
+			<button class="btn btn-outline-primary btn-sm" style="margin: 10px"
+				onclick="restartCloth();">Restart</button>
 		</div>
 
-		<script src="libs/three.min.js"></script>
-		<script src="libs/Detector.js"></script>
-		<script src="libs/TrackballControls.js"></script>
-		<script src="libs/stats.min.js"></script>
-		<script src="libs/dat.gui.min.js"></script>
+	</div>
 
-		<script src="./js/test.js"></script>
-		<script src="./js/Particle.js"></script>
-		<script src="./js/Cloth.js"></script>
-        <script src="./js/index.js"></script>
+	<script src="libs/three.min.js"></script>
+	<script src="libs/Detector.js"></script>
+	<script src="libs/TrackballControls.js"></script>
+	<script src="libs/stats.min.js"></script>
+	<script src="libs/dat.gui.min.js"></script>
 
-		<!-- <script type="x-shader/x-fragment" id="fragmentShaderDepth">
+	<script src="./js/test.js"></script>
+	<script src="./js/Particle.js"></script>
+	<script src="./js/Cloth.js"></script>
+	<script src="./js/index.js"></script>
+
+	<!-- <script type="x-shader/x-fragment" id="fragmentShaderDepth">
 
 			uniform sampler2D texture;
 			varying vec2 vUV;
@@ -72,6 +79,7 @@
 
 		</script> -->
 
-		
-	</body>
+
+</body>
+
 </html>
