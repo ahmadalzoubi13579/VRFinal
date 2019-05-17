@@ -15,8 +15,8 @@ var restDistanceB = 2;
 var restDistanceS = Math.sqrt(2);
 var restDistance; // = fabricLength/clothWidth;
 var structuralSprings = true;
-var shearSprings = true;
-var bendingSprings = true;
+var shearSprings = false;
+var bendingSprings = false;
 var DAMPING = 0.03;
 var DRAG = 1 - DAMPING;
 var MASS = .1;
@@ -28,7 +28,7 @@ var gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS);
 var TIMESTEP = 18 / 1000;
 var TIMESTEP_SQ = TIMESTEP * TIMESTEP;
 var rotate = false;
-var pinned = 'Corners';
+var pinned = 'OneEdge';
 var thing = 'Ball'
 var cornersPinned, oneEdgePinned, twoEdgesPinned, fourEdgesPinned, randomEdgesPinned;
 var avoidClothSelfIntersection = true;
@@ -270,14 +270,49 @@ function setup() {
         f3.addColor(guiControls, 'fogColor').name('Fog Color').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
 
     }
+
+    // console.log(Math.round(calculateSize(scene) / 1000) + ' MB')
+}
+
+function calculateSize( object ) {
+
+    var objectList = [];
+    var stack = [ object ];
+    var bytes = 0;
+
+    while ( stack.length ) {
+        var value = stack.pop();
+
+        if ( typeof value === 'boolean' ) {
+            bytes += 4;
+        }
+        else if ( typeof value === 'string' ) {
+            bytes += value.length * 2;
+        }
+        else if ( typeof value === 'number' ) {
+            bytes += 8;
+        }
+        else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf( value ) === -1
+        )
+        {
+            objectList.push( value );
+
+            for( var i in value ) {
+                stack.push( value[ i ] );
+            }
+        }
+    }
+    return bytes;
 }
 
 function clothInitialPosition(u, v) {
 
-    let drawWidth = 400, drawHeight = 400
-    let x = u * drawWidth - drawWidth / 2;
+    let x = u * fabricLength - fabricLength / 2;
     let y = 125; //height/2;
-    let z = v * drawHeight - drawHeight / 2;
+    let z = v * fabricLength - fabricLength / 2;
 
 
     return new THREE.Vector3(x, y, z);
@@ -536,11 +571,11 @@ function simulate(time) {
             particles[cloth.index(randX, randY)].lockToOriginal();
         }
     }
-
+    
 }
 
 function animate() {
-
+    
     let time = Date.now();
     simulate(time);
     render();
