@@ -169,7 +169,7 @@ function setup() {
 
 
     // Cloth
-    clothTexture = loader.load("assets/Cloth Textures/bright_squares256.png");
+    clothTexture = loader.load("assets/Cloth Textures/6873.jpg");
     clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
     clothTexture.anisotropy = 16;
 
