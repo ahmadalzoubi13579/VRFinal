@@ -239,6 +239,9 @@ function setup() {
 
         gui = new dat.GUI();
         gui.closed = true
+        gui.width = 270
+
+        // console.log(gui)
 
         let f0 = gui.add(guiControls, 'fabricLength', 200, 1000).step(20).name('Size').onChange(function (value) { fabricLength = value; clothWidth = Math.round(value / 20); clothHeight = Math.round(value / 20); restartCloth(); });
 
