@@ -38,7 +38,7 @@ class Particle {
     // Performs verlet integration
     integrate(timesq) {
 
-        var newPos = this.tmp.subVectors(this.position, this.previous);
+        let newPos = this.tmp.subVectors(this.position, this.previous);
         newPos.multiplyScalar(DRAG).add(this.position);
         newPos.add(this.a.multiplyScalar(timesq));
 

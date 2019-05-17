@@ -8,10 +8,10 @@ class Cloth {
         restDistance = l / w; // assuming square cloth for now
 
 
-        var particles = [];
-        var constrains = [];
+        let particles = [];
+        let constrains = [];
 
-        var u, v;
+        let u, v;
 
         // Create particles
         for (v = 0; v <= h; v++) {
@@ -146,10 +146,10 @@ class Cloth {
     satisifyConstrains(p1, p2, distance) {
 
         diff.subVectors(p2.position, p1.position);
-        var currentDist = diff.length();
+        let currentDist = diff.length();
         if (currentDist == 0) return; // prevents division by 0
-        var correction = diff.multiplyScalar((currentDist - distance) / currentDist);
-        var correctionHalf = correction.multiplyScalar(0.5);
+        let correction = diff.multiplyScalar((currentDist - distance) / currentDist);
+        let correctionHalf = correction.multiplyScalar(0.5);
         p1.position.add(correctionHalf);
         p2.position.sub(correctionHalf);
 
@@ -158,11 +158,11 @@ class Cloth {
     repelParticles(p1, p2, distance) {
 
         diff.subVectors(p2.position, p1.position);
-        var currentDist = diff.length();
+        let currentDist = diff.length();
         if (currentDist == 0) return; // prevents division by 0
         if (currentDist < distance) {
-            var correction = diff.multiplyScalar((currentDist - distance) / currentDist);
-            var correctionHalf = correction.multiplyScalar(0.5);
+            let correction = diff.multiplyScalar((currentDist - distance) / currentDist);
+            let correctionHalf = correction.multiplyScalar(0.5);
             p1.position.add(correctionHalf);
             p2.position.sub(correctionHalf);
         }

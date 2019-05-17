@@ -1,6 +1,6 @@
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-// global variables
+// global letiables
 var stats
 var renderer
 var scene
@@ -56,26 +56,26 @@ var intersects
 //////////////////////////////////////////////////////////////////////////////
 
 
-// var ballSize = 500 / 4; //40
-// var ballPosition = new THREE.Vector3(0, -250 + ballSize, 0);
-// var prevBallPosition = new THREE.Vector3(0, -250 + ballSize, 0);
+// let ballSize = 500 / 4; //40
+// let ballPosition = new THREE.Vector3(0, -250 + ballSize, 0);
+// let prevBallPosition = new THREE.Vector3(0, -250 + ballSize, 0);
 
 
-// // var ray = new THREE.Raycaster();
-// // var collisionResults, newCollisionResults;
-// var whereAmI, whereWasI;
-// // var directionOfMotion, distanceTraveled;
+// // let ray = new THREE.Raycaster();
+// // let collisionResults, newCollisionResults;
+// let whereAmI, whereWasI;
+// // let directionOfMotion, distanceTraveled;
 
-// var posFriction = new THREE.Vector3(0, 0, 0);
-// var posNoFriction = new THREE.Vector3(0, 0, 0);
+// let posFriction = new THREE.Vector3(0, 0, 0);
+// let posNoFriction = new THREE.Vector3(0, 0, 0);
 
-// var objectCenter = new THREE.Vector3();
+// let objectCenter = new THREE.Vector3();
 
-// var a, b, c, d, e, f;
+// let a, b, c, d, e, f;
 
-// var nearestX, nearestY, nearestZ;
-// var currentX, currentY, currentZ;
-// var xDist, yDist, zDist;
+// let nearestX, nearestY, nearestZ;
+// let currentX, currentY, currentZ;
+// let xDist, yDist, zDist;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -104,7 +104,7 @@ function setup() {
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
 
-    var d = 500;
+    let d = 500;
     light.shadow.camera.left = -d;
     light.shadow.camera.right = d;
     light.shadow.camera.top = d;
@@ -193,7 +193,7 @@ function setup() {
 
     document.body.appendChild(renderer.domElement);
 
-    window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener('mousemove', onMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
 
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
@@ -234,9 +234,9 @@ function setup() {
 
         gui = new dat.GUI();
 
-        var f0 = gui.add(guiControls, 'fabricLength', 200, 1000).step(20).name('Size').onChange(function (value) { fabricLength = value; clothWidth = Math.round(value / 20); clothHeight = Math.round(value / 20); restartCloth(); });
+        let f0 = gui.add(guiControls, 'fabricLength', 200, 1000).step(20).name('Size').onChange(function (value) { fabricLength = value; clothWidth = Math.round(value / 20); clothHeight = Math.round(value / 20); restartCloth(); });
 
-        var f4 = gui.addFolder('Interaction')
+        let f4 = gui.addFolder('Interaction')
 
         f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
@@ -244,7 +244,7 @@ function setup() {
         // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
         f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
-        var f1 = gui.addFolder('Behavior');
+        let f1 = gui.addFolder('Behavior');
 
         f1.add(guiControls, 'structuralSprings').name('Structural Springs').onChange(function (value) { structuralSprings = value; restartCloth(); });
         f1.add(guiControls, 'shearSprings').name('Shear Springs').onChange(function (value) { shearSprings = value; restartCloth(); });
@@ -253,7 +253,7 @@ function setup() {
         f1.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
         //f1.add(guiControls, 'weight', 0, 500).step(1).onChange(function(value){weight = value; restartCloth();});
 
-        var f3 = gui.addFolder('Appearance');
+        let f3 = gui.addFolder('Appearance');
         f3.addColor(guiControls, 'clothColor').name('Cloth Color').onChange(function (value) { clothMaterial.color.setHex(value); });
         f3.addColor(guiControls, 'clothSpecular').name('Cloth Reflection').onChange(function (value) { clothMaterial.specular.setHex(value); });
         f3.addColor(guiControls, 'groundColor').name('Ground Color').onChange(function (value) { groundMaterial.color.setHex(value); });
@@ -331,13 +331,13 @@ function pinCloth(choice) {
     }
 }
 
-function onMouseMove( event ) {
+function onMouseMove(event) {
 
-	// calculate mouse position in normalized device coordinates
-	// (-1 to +1) for both components
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
 
-	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
 }
 
@@ -385,14 +385,14 @@ function wireFrame() {
 }
 
 function render() {
-    var timer = Date.now() * 0.0002;
+    let timer = Date.now() * 0.0002;
 
 
     // update position of the cloth
     // i.e. copy positions from the particles (i.e. result of physics simulation)
     // to the cloth geometry
-    var p = cloth.particles;
-    for (var i = 0, il = p.length; i < il; i++) {
+    let p = cloth.particles;
+    for (let i = 0, il = p.length; i < il; i++) {
         clothGeometry.vertices[i].copy(p[i].position);
     }
 
@@ -408,18 +408,18 @@ function render() {
 
     // option to auto-rotate camera
     if (rotate) {
-        var cameraRadius = Math.sqrt(camera.position.x * camera.position.x + camera.position.z * camera.position.z);
+        let cameraRadius = Math.sqrt(camera.position.x * camera.position.x + camera.position.z * camera.position.z);
         camera.position.x = Math.cos(timer) * cameraRadius;
         camera.position.z = Math.sin(timer) * cameraRadius;
     }
 
     raycaster.setFromCamera(mouse, camera);
-    intersects = raycaster.intersectObjects( scene.children );
-    for ( var i = 0; i < intersects.length; i++ ) {
-		intersects[ i ].object.material.color.set( 0xff0000 );
-    }
-    
-    console.log(intersects);
+    intersects = raycaster.intersectObjects(scene.children);
+    // for ( let i = 0; i < intersects.length; i++ ) {
+    // 	intersects[ i ].object.material.color.set( 0xff0000 );
+    // }
+
+    // console.log(intersects);
 
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
@@ -428,7 +428,7 @@ function render() {
 
 function simulate(time) {
 
-    var i, il, particles, particle, pt, constrains, constrain;
+    let i, il, particles, particle, pt, constrains, constrain;
 
     // Aerodynamics forces
     if (wind) {
@@ -442,7 +442,7 @@ function simulate(time) {
         ).normalize().multiplyScalar(windStrength);
 
         // apply the wind force to the cloth particles
-        var face, faces = clothGeometry.faces, normal;
+        let face, faces = clothGeometry.faces, normal;
         particles = cloth.particles;
         for (i = 0, il = faces.length; i < il; i++) {
             face = faces[i];
@@ -533,8 +533,7 @@ function simulate(time) {
 
 function animate() {
 
-
-    var time = Date.now();
+    let time = Date.now();
     simulate(time);
     render();
     stats.update();
