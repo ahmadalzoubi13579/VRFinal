@@ -49,6 +49,9 @@ var poleMat
 var poleRight
 var poleLeft
 var showPoles = true
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var intersects
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -190,6 +193,7 @@ function setup() {
 
     document.body.appendChild(renderer.domElement);
 
+    window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener('resize', onWindowResize, false);
 
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
@@ -236,7 +240,7 @@ function setup() {
 
         f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
-        f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles()});
+        f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles() });
         // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
         f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
@@ -257,6 +261,9 @@ function setup() {
         f3.addColor(guiControls, 'fogColor').name('Fog Color').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
 
     }
+
+    // console.log(scene.children)
+
 
 }
 
@@ -322,6 +329,16 @@ function pinCloth(choice) {
         fourEdgesPinned = false;
         randomEdgesPinned = false;
     }
+}
+
+function onMouseMove( event ) {
+
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 }
 
 function onWindowResize() {
@@ -395,6 +412,14 @@ function render() {
         camera.position.x = Math.cos(timer) * cameraRadius;
         camera.position.z = Math.sin(timer) * cameraRadius;
     }
+
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObjects( scene.children );
+    for ( var i = 0; i < intersects.length; i++ ) {
+		intersects[ i ].object.material.color.set( 0xff0000 );
+    }
+    
+    console.log(intersects);
 
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
