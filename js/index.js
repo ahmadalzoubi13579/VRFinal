@@ -261,18 +261,14 @@ function setup() {
         f3.addColor(guiControls, 'fogColor').name('Fog Color').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
 
     }
-
-    // console.log(scene.children)
-
-
 }
 
 function clothInitialPosition(u, v) {
 
-    let width = 400, height = 400
-    let x = u * width - width / 2;
+    let drawWidth = 400, drawHeight = 400
+    let x = u * drawWidth - drawWidth / 2;
     let y = 125; //height/2;
-    let z = v * height - height / 2;
+    let z = v * drawHeight - drawHeight / 2;
 
 
     return new THREE.Vector3(x, y, z);
@@ -339,6 +335,7 @@ function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
+
 }
 
 function onWindowResize() {
@@ -385,8 +382,8 @@ function wireFrame() {
 }
 
 function render() {
-    let timer = Date.now() * 0.0002;
 
+    let timer = Date.now() * 0.0002;
 
     // update position of the cloth
     // i.e. copy positions from the particles (i.e. result of physics simulation)
@@ -415,11 +412,13 @@ function render() {
 
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children);
-    // for ( let i = 0; i < intersects.length; i++ ) {
-    // 	intersects[ i ].object.material.color.set( 0xff0000 );
-    // }
+    for (let i = 0; i < intersects.length; i++) {
+        if (intersects[i].object.geometry.type === 'ParametricGeometry') {
+            // intersects[ i ].object.material.color.set( 0xff0000 );
+        }
+    }
 
-    // console.log(intersects);
+    console.log(intersects);
 
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
