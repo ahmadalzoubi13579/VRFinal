@@ -95,7 +95,7 @@ function setup() {
     scene.add(camera);
 
     // light
-    scene.add(new THREE.AmbientLight(0x666666));
+    scene.add(new THREE.AmbientLight(0xffffff));
     light = new THREE.DirectionalLight(0xdfebff, 1.75);
     light.position.set(50, 200, 100);
     light.position.multiplyScalar(1.3);
@@ -128,7 +128,7 @@ function setup() {
 
     // ground
     loader = new THREE.TextureLoader();
-    groundTexture = loader.load("assets/terrain/backgrounddetailed6.jpg");
+    groundTexture = loader.load("assets/terrain/wood floor.jpg");
     groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(25, 25);
     groundTexture.anisotropy = 16;
