@@ -125,26 +125,28 @@ function setup() {
     renderer.shadowMap.enabled = true;
     // scene.background = new THREE.Color(0x343434);
 
-
     // ground
-    loader = new THREE.TextureLoader();
-    groundTexture = loader.load("assets/Ground Textures/wood floor.jpg");
-    groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-    groundTexture.repeat.set(25, 25);
-    groundTexture.anisotropy = 16;
-
     groundMaterial = new THREE.MeshPhongMaterial(
         {
             color: 0x404761,//0x3c3c3c,
             specular: 0x404761,//0x3c3c3c//,
-            map: groundTexture
         });
-
 
     mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(20000, 20000), groundMaterial);
     mesh.position.y = -250;
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
+    mesh.material.needsUpdate = true;
+    
+    loader = new THREE.TextureLoader();
+    groundTexture = loader.load("assets/images/Ground Textures/wood floor.jpg", function (map) {
+        mesh.material.map = map;
+        mesh.material.needsUpdate = true;
+    });
+    groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+    groundTexture.repeat.set(25, 25);
+    groundTexture.anisotropy = 16;
+    
     scene.add(mesh); // add ground to scene
 
     // poles
@@ -169,26 +171,29 @@ function setup() {
 
 
     // Cloth
-    clothTexture = loader.load("assets/Cloth Textures/6873.jpg");
-    clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
-    clothTexture.anisotropy = 16;
-
-
+    
     clothMaterial = new THREE.MeshPhongMaterial({
         color: 0x827171,
         specular: 0x030303,
         wireframeLinewidth: 2,
-        map: clothTexture,
         side: THREE.DoubleSide,
         alphaTest: 0.5
     });
-
+    
     clothGeometry = new THREE.ParametricGeometry(clothInitialPosition, clothWidth, clothHeight);
     clothGeometry.dynamic = true;
-
+    
     clothObject = new THREE.Mesh(clothGeometry, clothMaterial);
     clothObject.castShadow = true;
     clothObject.position.set(0, 0, 0);
+
+    clothTexture = loader.load("assets/images/Cloth Textures/6873.jpg", function (map) {
+        clothObject.material.map = map;
+        clothObject.material.needsUpdate = true;
+    });
+    clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
+    clothTexture.anisotropy = 16;
+
     scene.add(clothObject)
 
     document.body.appendChild(renderer.domElement);
@@ -233,6 +238,7 @@ function setup() {
         };
 
         gui = new dat.GUI();
+        gui.closed = true
 
         let f0 = gui.add(guiControls, 'fabricLength', 200, 1000).step(20).name('Size').onChange(function (value) { fabricLength = value; clothWidth = Math.round(value / 20); clothHeight = Math.round(value / 20); restartCloth(); });
 
@@ -418,7 +424,7 @@ function render() {
         }
     }
 
-    console.log(intersects);
+    // console.log(intersects);
 
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
