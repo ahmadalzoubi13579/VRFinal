@@ -128,7 +128,7 @@ function setup() {
 
     // ground
     loader = new THREE.TextureLoader();
-    groundTexture = loader.load("assets/terrain/wood floor.jpg");
+    groundTexture = loader.load("assets/Ground Textures/wood floor.jpg");
     groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(25, 25);
     groundTexture.anisotropy = 16;
@@ -169,7 +169,7 @@ function setup() {
 
 
     // Cloth
-    clothTexture = loader.load("assets/patterns/bright_squares256.png");
+    clothTexture = loader.load("assets/Cloth Textures/bright_squares256.png");
     clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
     clothTexture.anisotropy = 16;
 
