@@ -53,6 +53,10 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var intersects
 
+var object
+var selected
+var offset = new THREE.Vector3()
+
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -137,7 +141,7 @@ function setup() {
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
     mesh.material.needsUpdate = true;
-    
+
     loader = new THREE.TextureLoader();
     groundTexture = loader.load("assets/images/Ground Textures/wood floor.jpg", function (map) {
         mesh.material.map = map;
@@ -146,7 +150,7 @@ function setup() {
     groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
     groundTexture.repeat.set(25, 25);
     groundTexture.anisotropy = 16;
-    
+
     scene.add(mesh); // add ground to scene
 
     // poles
@@ -171,7 +175,7 @@ function setup() {
 
 
     // Cloth
-    
+
     clothMaterial = new THREE.MeshPhongMaterial({
         color: 0x827171,
         specular: 0x030303,
@@ -179,10 +183,10 @@ function setup() {
         side: THREE.DoubleSide,
         alphaTest: 0.5
     });
-    
+
     clothGeometry = new THREE.ParametricGeometry(clothInitialPosition, clothWidth, clothHeight);
     clothGeometry.dynamic = true;
-    
+
     clothObject = new THREE.Mesh(clothGeometry, clothMaterial);
     clothObject.castShadow = true;
     clothObject.position.set(0, 0, 0);
@@ -197,9 +201,6 @@ function setup() {
     scene.add(clothObject)
 
     document.body.appendChild(renderer.domElement);
-
-    window.addEventListener('mousemove', onMouseMove, false);
-    window.addEventListener('resize', onWindowResize, false);
 
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
     pinCloth('OneEdge');
@@ -271,51 +272,153 @@ function setup() {
 
     }
 
-    // console.log(Math.round(calculateSize(scene) / 1000) + ' MB')
+    var objects = [];
+
+
+    var objGeometry = new THREE.SphereGeometry(1, 24, 24);
+    var material = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
+    material.transparent = true;
+    object = new THREE.Mesh(objGeometry.clone(), material);
+    var radius = 40;
+    object.scale.x = radius;
+    object.scale.y = radius;
+    object.scale.z = radius;
+    object.position.x = 200;
+    object.position.y = 120;
+    object.position.z = 50;
+
+    objects.push(object)
+
+    var object2 = new THREE.Mesh(objGeometry.clone(), material);
+    var radius = 20;
+    object2.scale.x = radius;
+    object2.scale.y = radius;
+    object2.scale.z = radius;
+    object2.position.x = 350;
+    object2.position.y = 150;
+    object2.position.z = 50;
+
+    objects.push(object2)
+    objects.push(clothObject)
+
+    scene.add(object)
+    scene.add(object2)
+
+    window.addEventListener('resize', onWindowResize);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+
+
+    // var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+    // dragControls.addEventListener('dragstart', function () {
+    //     // controls.enabled = false;
+    //     console.log('start')
+    // });
+    // dragControls.addEventListener('dragend', function () {
+    //     // controls.enabled = true;
+    //     console.log('end')
+    // });
+
 }
 
-function calculateSize( object ) {
+
+
+function onMouseDown(event) {
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObject(object);
+
+    if (intersects.length) {
+        selected = true
+
+    }
+}
+
+function onMouseMove(event) {
+
+    if (selected) {
+
+        var x, y;
+
+        if (event.offsetX !== undefined) {
+            x = event.offsetX;
+            y = event.offsetY;
+        } else {
+            x = event.layerX;
+            y = event.layerY;
+        }
+
+        var pos = new THREE.Vector3(0, 0, 0);
+        var pMouse = new THREE.Vector3(
+            (event.clientX / window.innerWidth) * 2 - 1,
+            - (event.clientY / window.innerHeight) * 2 + 1,
+            1);
+        //
+        var projector = new THREE.Projector();
+        projector.unprojectVector(pMouse, camera);
+
+        var cam = camera.position;
+        var m = pMouse.y / (pMouse.y - cam.y);
+
+        pos.x = pMouse.x + (cam.x - pMouse.x) * m;
+        pos.z = pMouse.z + (cam.z - pMouse.z) * m;
+
+        console.log(pos)
+
+        object.position.copy(pos)
+    }
+
+}
+
+function onMouseUp(event) {
+    selected = false
+}
+
+
+function calculateSize(object) {
 
     var objectList = [];
-    var stack = [ object ];
+    var stack = [object];
     var bytes = 0;
 
-    while ( stack.length ) {
+    while (stack.length) {
         var value = stack.pop();
 
-        if ( typeof value === 'boolean' ) {
+        if (typeof value === 'boolean') {
             bytes += 4;
         }
-        else if ( typeof value === 'string' ) {
+        else if (typeof value === 'string') {
             bytes += value.length * 2;
         }
-        else if ( typeof value === 'number' ) {
+        else if (typeof value === 'number') {
             bytes += 8;
         }
         else if
-        (
+            (
             typeof value === 'object'
-            && objectList.indexOf( value ) === -1
-        )
-        {
-            objectList.push( value );
+            && objectList.indexOf(value) === -1
+        ) {
+            objectList.push(value);
 
-            for( var i in value ) {
-                stack.push( value[ i ] );
+            for (var i in value) {
+                stack.push(value[i]);
             }
         }
     }
     return bytes;
 }
 
-function clothInitialPosition(u, v) {
+function clothInitialPosition(u, v, target) {
 
     let x = u * fabricLength - fabricLength / 2;
-    let y = 125; //height/2;
+    let y = 125;
     let z = v * fabricLength - fabricLength / 2;
 
-
-    return new THREE.Vector3(x, y, z);
+    target.set(x, y, z)
 }
 
 function pinCloth(choice) {
@@ -369,17 +472,6 @@ function pinCloth(choice) {
         fourEdgesPinned = false;
         randomEdgesPinned = false;
     }
-}
-
-function onMouseMove(event) {
-
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
-
 }
 
 function onWindowResize() {
@@ -454,15 +546,8 @@ function render() {
         camera.position.z = Math.sin(timer) * cameraRadius;
     }
 
-    raycaster.setFromCamera(mouse, camera);
-    intersects = raycaster.intersectObjects(scene.children);
-    for (let i = 0; i < intersects.length; i++) {
-        if (intersects[i].object.geometry.type === 'ParametricGeometry') {
-            // intersects[ i ].object.material.color.set( 0xff0000 );
-        }
-    }
 
-    // console.log(intersects);
+
 
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
@@ -571,11 +656,11 @@ function simulate(time) {
             particles[cloth.index(randX, randY)].lockToOriginal();
         }
     }
-    
+
 }
 
 function animate() {
-    
+
     let time = Date.now();
     simulate(time);
     render();

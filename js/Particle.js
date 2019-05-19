@@ -1,9 +1,12 @@
 class Particle {
 
     constructor(x, y, z, mass) {
-        this.position = clothInitialPosition(x, y)
-        this.previous = clothInitialPosition(x, y); // previous
-        this.original = clothInitialPosition(x, y); // original
+        this.position = new THREE.Vector3()
+        clothInitialPosition(x, y, this.position)
+        this.previous = new THREE.Vector3()
+        clothInitialPosition(x, y, this.previous)
+        this.original = new THREE.Vector3()
+        clothInitialPosition(x, y, this.original)
         this.a = new THREE.Vector3(0, 0, 0); // acceleration
         this.mass = mass;
         this.invMass = 1 / mass;
