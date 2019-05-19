@@ -55,7 +55,12 @@ var intersects
 
 var object
 var selected
+var clothSelected
 var offset = new THREE.Vector3()
+var pos
+var mouseDown = false
+var position
+var objects = [];
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -272,9 +277,6 @@ function setup() {
 
     }
 
-    var objects = [];
-
-
     var objGeometry = new THREE.SphereGeometry(1, 24, 24);
     var material = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     material.transparent = true;
@@ -330,52 +332,95 @@ function onMouseDown(event) {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    intersects = raycaster.intersectObject(object);
+    intersects = raycaster.intersectObjects(objects);
 
     if (intersects.length) {
-        selected = true
+        selected = intersects[0].object
+        if (intersects[0].object.geometry.type === 'ParametricGeometry') {
+            clothSelected = true
+        }
 
     }
+
+    var vector = new THREE.Vector3();
+    vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
+    vector.unproject(camera);
+    var dir = vector.sub(camera.position).normalize();
+    var distance = - camera.position.z / dir.z;
+    position = camera.position.clone().add(dir.multiplyScalar(distance));
+
+    // object.position.copy(position)
+
+
+    //////////////////
+
+    // var vector = new THREE.Vector3();
+    // vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
+    // vector.unproject(camera);
+    // var dir = vector.sub(camera.position).normalize();
+    // var distance = - camera.position.z / dir.z;
+    // position = camera.position.clone().add(dir.multiplyScalar(distance));
+
+
+
+
+
+
+    ///////////////
 }
 
 function onMouseMove(event) {
 
     if (selected) {
 
-        var x, y;
+        // var x, y;
 
-        if (event.offsetX !== undefined) {
-            x = event.offsetX;
-            y = event.offsetY;
-        } else {
-            x = event.layerX;
-            y = event.layerY;
+        // if (event.offsetX !== undefined) {
+        //     x = event.offsetX;
+        //     y = event.offsetY;
+        // } else {
+        //     x = event.layerX;
+        //     y = event.layerY;
+        // }
+
+        // var pos = new THREE.Vector3(0, 0, 0);
+        // var pMouse = new THREE.Vector3(
+        //     (event.clientX / window.innerWidth) * 2 - 1,
+        //     - (event.clientY / window.innerHeight) * 2 + 1,
+        //     1);
+        // //
+        // var projector = new THREE.Projector();
+        // projector.unprojectVector(pMouse, camera);
+
+        // var cam = camera.position;
+        // var m = pMouse.y / (pMouse.y - cam.y);
+
+        // pos.x = pMouse.x + (cam.x - pMouse.x) * m;
+        // pos.z = pMouse.z + (cam.z - pMouse.z) * m;
+
+        // console.log(pos)
+
+        var vector = new THREE.Vector3();
+        vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
+        vector.unproject(camera);
+        var dir = vector.sub(camera.position).normalize();
+        var distance = - camera.position.z / dir.z;
+        position = camera.position.clone().add(dir.multiplyScalar(distance));
+        // console.log("x: " + position.x + " y: " + position.y);
+
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        if (!clothSelected) {
+            selected.position.copy(position)
         }
-
-        var pos = new THREE.Vector3(0, 0, 0);
-        var pMouse = new THREE.Vector3(
-            (event.clientX / window.innerWidth) * 2 - 1,
-            - (event.clientY / window.innerHeight) * 2 + 1,
-            1);
-        //
-        var projector = new THREE.Projector();
-        projector.unprojectVector(pMouse, camera);
-
-        var cam = camera.position;
-        var m = pMouse.y / (pMouse.y - cam.y);
-
-        pos.x = pMouse.x + (cam.x - pMouse.x) * m;
-        pos.z = pMouse.z + (cam.z - pMouse.z) * m;
-
-        console.log(pos)
-
-        object.position.copy(pos)
     }
 
 }
 
 function onMouseUp(event) {
-    selected = false
+    selected = null
+    clothSelected = false
 }
 
 
@@ -657,6 +702,11 @@ function simulate(time) {
         }
     }
 
+    if (clothSelected) {
+        particles[100].position.copy(position)
+    }
+
+    // console.log(particles)
 }
 
 function animate() {
