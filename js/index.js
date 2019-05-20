@@ -78,6 +78,7 @@ var closestParticleIndex
 
 // let objectCenter = new THREE.Vector3();
 
+
 // let a, b, c, d, e, f;
 
 // let nearestX, nearestY, nearestZ;
@@ -320,6 +321,7 @@ function setup() {
     //     console.log('end')
     // });
 
+
 }
 
 function onMouseDown(event) {
@@ -350,7 +352,7 @@ function onMouseDown(event) {
     var distance = - camera.position.z / dir.z;
     mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
-    closestParticleIndex = getClosestParticle(cloth.particles, mousePosition) 
+    closestParticleIndex = getClosestParticle(cloth.particles, mousePosition)
 
 
 }
@@ -380,12 +382,12 @@ function onMouseUp(event) {
 }
 
 function getClosestParticle(particles, mousePosition) {
-    
+
     let min = 1000
     let index
     let tempPosition = new THREE.Vector3()
 
-    for (let i = 0; i < particles.length; i++){
+    for (let i = 0; i < particles.length; i++) {
         tempPosition.copy(particles[i].position)
         tempPosition.setZ(0)
         let dis = mousePosition.distanceTo(tempPosition)
