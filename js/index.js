@@ -56,9 +56,6 @@ var intersects
 var object
 var selected
 var clothSelected
-var offset = new THREE.Vector3()
-var pos
-var mouseDown = false
 var position
 var objects = [];
 
@@ -285,7 +282,7 @@ function setup() {
     object.scale.x = radius;
     object.scale.y = radius;
     object.scale.z = radius;
-    object.position.x = 200;
+    object.position.x = 250;
     object.position.y = 120;
     object.position.z = 50;
 
@@ -332,6 +329,8 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(objects);
 
+    // Detect The Intersetced Objects
+
     if (intersects.length) {
         selected = intersects[0].object
         if (intersects[0].object.geometry.type === 'ParametricGeometry') {
@@ -354,14 +353,18 @@ function onMouseDown(event) {
 
 function onMouseMove(event) {
 
-    if (selected && !clothSelected) {
+    if (selected) {
         var vector = new THREE.Vector3();
         vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
         vector.unproject(camera);
         var dir = vector.sub(camera.position).normalize();
         var distance = - camera.position.z / dir.z;
         position = camera.position.clone().add(dir.multiplyScalar(distance));
-        selected.position.copy(position)
+
+        // move all objects except Cloth
+        if (!clothSelected) {
+            selected.position.copy(position)
+        }
 
     }
 
@@ -584,6 +587,8 @@ function simulate(time) {
     }
 
     // mvoe cloth with mouse
+
+
 
     if (clothSelected) {
         particles[100].position.copy(position)
