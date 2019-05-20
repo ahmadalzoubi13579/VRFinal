@@ -1,6 +1,6 @@
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-// global letiables
+// global variables
 var stats
 var renderer
 var scene
@@ -257,7 +257,7 @@ function setup() {
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
         f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles() });
         // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
-        f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges']).name('Pinned').onChange(function (value) { pinCloth(value); });
+        f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges', 'Random']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
         let f1 = gui.addFolder('Behavior');
 
@@ -324,8 +324,6 @@ function setup() {
 
 }
 
-
-
 function onMouseDown(event) {
 
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -342,6 +340,9 @@ function onMouseDown(event) {
 
     }
 
+    // convert 2D mouse Coordinate System to THREE.JS Coordinate System
+    // mouse(x,y) ==> THREE.js(x,y,0)
+
     var vector = new THREE.Vector3();
     vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
     vector.unproject(camera);
@@ -349,71 +350,19 @@ function onMouseDown(event) {
     var distance = - camera.position.z / dir.z;
     position = camera.position.clone().add(dir.multiplyScalar(distance));
 
-    // object.position.copy(position)
-
-
-    //////////////////
-
-    // var vector = new THREE.Vector3();
-    // vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
-    // vector.unproject(camera);
-    // var dir = vector.sub(camera.position).normalize();
-    // var distance = - camera.position.z / dir.z;
-    // position = camera.position.clone().add(dir.multiplyScalar(distance));
-
-
-
-
-
-
-    ///////////////
 }
 
 function onMouseMove(event) {
 
-    if (selected) {
-
-        // var x, y;
-
-        // if (event.offsetX !== undefined) {
-        //     x = event.offsetX;
-        //     y = event.offsetY;
-        // } else {
-        //     x = event.layerX;
-        //     y = event.layerY;
-        // }
-
-        // var pos = new THREE.Vector3(0, 0, 0);
-        // var pMouse = new THREE.Vector3(
-        //     (event.clientX / window.innerWidth) * 2 - 1,
-        //     - (event.clientY / window.innerHeight) * 2 + 1,
-        //     1);
-        // //
-        // var projector = new THREE.Projector();
-        // projector.unprojectVector(pMouse, camera);
-
-        // var cam = camera.position;
-        // var m = pMouse.y / (pMouse.y - cam.y);
-
-        // pos.x = pMouse.x + (cam.x - pMouse.x) * m;
-        // pos.z = pMouse.z + (cam.z - pMouse.z) * m;
-
-        // console.log(pos)
-
+    if (selected && !clothSelected) {
         var vector = new THREE.Vector3();
         vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
         vector.unproject(camera);
         var dir = vector.sub(camera.position).normalize();
         var distance = - camera.position.z / dir.z;
         position = camera.position.clone().add(dir.multiplyScalar(distance));
-        // console.log("x: " + position.x + " y: " + position.y);
+        selected.position.copy(position)
 
-        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        if (!clothSelected) {
-            selected.position.copy(position)
-        }
     }
 
 }
@@ -422,7 +371,6 @@ function onMouseUp(event) {
     selected = null
     clothSelected = false
 }
-
 
 function calculateSize(object) {
 
@@ -635,6 +583,12 @@ function simulate(time) {
         particle.integrate(TIMESTEP_SQ); // performs verlet integration
     }
 
+    // mvoe cloth with mouse
+
+    if (clothSelected) {
+        particles[100].position.copy(position)
+    }
+
     // Start Constrains
 
     constrains = cloth.constrains,
@@ -702,9 +656,7 @@ function simulate(time) {
         }
     }
 
-    if (clothSelected) {
-        particles[100].position.copy(position)
-    }
+
 
     // console.log(particles)
 }
