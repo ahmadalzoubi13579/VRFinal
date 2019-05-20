@@ -1,4 +1,10 @@
 // let a = new THREE.Vector3(2, 2, 0);
+// let b = new THREE.Vector3(4, 4, 0)
+// let dis = a.distanceTo(b)
+// var num = 2.8284271248461904
+// console.log(dis);
+// console.log(typeof (dis))
+// console.log(num);
 
 // console.log(a.length())
 

@@ -56,8 +56,9 @@ var intersects
 var object
 var selected
 var clothSelected
-var position
+var mousePosition
 var objects = [];
+var closestParticleIndex
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -347,7 +348,10 @@ function onMouseDown(event) {
     vector.unproject(camera);
     var dir = vector.sub(camera.position).normalize();
     var distance = - camera.position.z / dir.z;
-    position = camera.position.clone().add(dir.multiplyScalar(distance));
+    mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
+
+    closestParticleIndex = getClosestParticle(cloth.particles, mousePosition) 
+
 
 }
 
@@ -359,11 +363,11 @@ function onMouseMove(event) {
         vector.unproject(camera);
         var dir = vector.sub(camera.position).normalize();
         var distance = - camera.position.z / dir.z;
-        position = camera.position.clone().add(dir.multiplyScalar(distance));
+        mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
         // move all objects except Cloth
         if (!clothSelected) {
-            selected.position.copy(position)
+            selected.position.copy(mousePosition)
         }
 
     }
@@ -373,6 +377,25 @@ function onMouseMove(event) {
 function onMouseUp(event) {
     selected = null
     clothSelected = false
+}
+
+function getClosestParticle(particles, mousePosition) {
+    
+    let min = 1000
+    let index
+    let tempPosition = new THREE.Vector3()
+
+    for (let i = 0; i < particles.length; i++){
+        tempPosition.copy(particles[i].position)
+        tempPosition.setZ(0)
+        let dis = mousePosition.distanceTo(tempPosition)
+        if (dis < min) {
+            min = dis
+            index = i
+        }
+    }
+
+    return index
 }
 
 function calculateSize(object) {
@@ -588,10 +611,8 @@ function simulate(time) {
 
     // mvoe cloth with mouse
 
-
-
     if (clothSelected) {
-        particles[100].position.copy(position)
+        particles[closestParticleIndex].position.copy(mousePosition)
     }
 
     // Start Constrains
