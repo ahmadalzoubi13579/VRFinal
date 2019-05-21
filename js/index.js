@@ -53,7 +53,7 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 var intersects
 
-var object
+var sphere
 var object2
 var radius = 40
 var selected
@@ -61,6 +61,8 @@ var clothSelected
 var mousePosition = new THREE.Vector3()
 var objects = [];
 var closestParticleIndex
+var cube
+var thing = 'None'
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -203,13 +205,36 @@ function setup() {
     });
     clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
     clothTexture.anisotropy = 16;
-
     scene.add(clothObject)
+    objects.push(clothObject)
+
+    var sphereGeometry = new THREE.SphereGeometry(radius, 24, 24);
+    var sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
+    sphereMaterial.transparent = true;
+    sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    radius = 40;
+    sphere.position.x = 100;
+    sphere.position.y = 10;
+    sphere.position.z = -200;
+    scene.add(sphere)
+
+    var cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
+    var cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
+    cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.position.z = -200
+    scene.add(cube);
+
+    cloth = new Cloth(clothWidth, clothHeight, fabricLength);
+
+    pinCloth('OneEdge');
+    showObject('None')
 
     document.body.appendChild(renderer.domElement);
 
-    cloth = new Cloth(clothWidth, clothHeight, fabricLength);
-    pinCloth('OneEdge');
+    window.addEventListener('resize', onWindowResize);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
 
     if (guiEnabled) {
 
@@ -257,7 +282,7 @@ function setup() {
         f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
         f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles() });
-        // f4.add(guiControls, 'thing', ['None', 'Ball', 'Table']).name('object').onChange(function(value){createThing(value);});
+        f4.add(guiControls, 'thing', ['None', 'Sphere', 'Cube']).name('Object').onChange(function (value) { showObject(value); });
         f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges', 'Random']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
         let f1 = gui.addFolder('Behavior');
@@ -277,38 +302,6 @@ function setup() {
         f3.addColor(guiControls, 'fogColor').name('Fog Color').onChange(function (value) { scene.fog.color.setHex(value); renderer.setClearColor(scene.fog.color); });
 
     }
-
-    var objGeometry = new THREE.SphereGeometry(radius, 24, 24);
-    var material = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
-    material.transparent = true;
-    object = new THREE.Mesh(objGeometry.clone(), material);
-    radius = 40;
-    object.position.x = 100;
-    object.position.y = 10;
-    object.position.z = -200;
-
-    // objects.push(object)
-
-    // console.log(object)
-
-    object2 = new THREE.Mesh(objGeometry.clone(), material);
-    object2.position.x = 350;
-    object2.position.y = 120;
-    object2.position.z = 0;
-
-    // objects.push(object2)
-    objects.push(clothObject)
-
-    scene.add(object)
-    // scene.add(object2)
-
-    // console.log(objects[0]);
-
-
-    window.addEventListener('resize', onWindowResize);
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
 
 
     // var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
@@ -369,7 +362,7 @@ function onMouseMove(event) {
 
     // move any selected object except Cloth
     // if (selected && !clothSelected) {
-    //     // mousePosition.setZ(selected.position.z)
+    //     mousePosition.setZ(selected.position.z)
     //     selected.position.copy(mousePosition)
     // }
 
@@ -404,10 +397,21 @@ function getClosestParticle(particles, mousePosition) {
 function isIntersectWithSphere(point, spherePosition) {
 
     if (point.distanceTo(spherePosition) < radius) {
-        // console.log('collision');
+        console.log('ball collision');
 
     }
 
+}
+
+function isIntersectWithCube(point, cubePosition, width, height, depth) {
+
+    if ((point.x >= cubePosition.x - width / 2 && point.x <= cubePosition.x + width / 2) &&
+        (point.y >= cubePosition.y - height / 2 && point.y <= cubePosition.y + height / 2) &&
+        (point.z >= cubePosition.z - depth / 2 && point.z <= cubePosition.z + depth / 2)
+
+    ) {
+        console.log('cube collistion')
+    }
 }
 
 function calculateSize(object) {
@@ -502,6 +506,21 @@ function pinCloth(choice) {
         twoEdgesPinned = false;
         fourEdgesPinned = false;
         randomEdgesPinned = false;
+    }
+}
+
+function showObject(object) {
+    if (object == 'None') {
+        sphere.visible = !sphere.visible
+        cube.visible = !cube.visible
+    }
+    else if (object == 'Sphere') {
+        sphere.visible = !sphere.visible
+        cube.visible = false
+    }
+    else if (object == 'Cube') {
+        cube.visible = !cube.visible
+        sphere.visible = false
     }
 }
 
@@ -631,9 +650,21 @@ function simulate(time) {
 
     // console.log(particles)
 
-    for (let i = 0; i < particles.length; i++) {
+    if (sphere.visible) {
 
-        isIntersectWithSphere(particles[i].position, object.position)
+        for (let i = 0; i < particles.length; i++) {
+
+            isIntersectWithSphere(particles[i].position, sphere.position)
+        }
+    }
+
+    if (cube.visible) {
+
+        for (let i = 0; i < particles.length; i++) {
+
+            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
+        }
+
     }
 
 
