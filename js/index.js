@@ -20,7 +20,7 @@ var bendingSprings = false;
 var DAMPING = 0.03;
 var DRAG = 1 - DAMPING;
 var MASS = .1;
-var wind = true;
+var wind = false;
 var windStrength;
 var windForce = new THREE.Vector3(0, 0, 0);
 var GRAVITY = 9.81 * 140; //
@@ -54,9 +54,11 @@ var mouse = new THREE.Vector2();
 var intersects
 
 var object
+var object2
+var radius = 40
 var selected
 var clothSelected
-var mousePosition
+var mousePosition = new THREE.Vector3()
 var objects = [];
 var closestParticleIndex
 
@@ -276,34 +278,32 @@ function setup() {
 
     }
 
-    var objGeometry = new THREE.SphereGeometry(1, 24, 24);
+    var objGeometry = new THREE.SphereGeometry(radius, 24, 24);
     var material = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     material.transparent = true;
     object = new THREE.Mesh(objGeometry.clone(), material);
-    var radius = 40;
-    object.scale.x = radius;
-    object.scale.y = radius;
-    object.scale.z = radius;
-    object.position.x = 250;
-    object.position.y = 120;
-    object.position.z = 50;
+    radius = 40;
+    object.position.x = 100;
+    object.position.y = 10;
+    object.position.z = -200;
 
-    objects.push(object)
+    // objects.push(object)
 
-    var object2 = new THREE.Mesh(objGeometry.clone(), material);
-    var radius = 20;
-    object2.scale.x = radius;
-    object2.scale.y = radius;
-    object2.scale.z = radius;
+    // console.log(object)
+
+    object2 = new THREE.Mesh(objGeometry.clone(), material);
     object2.position.x = 350;
-    object2.position.y = 150;
-    object2.position.z = 50;
+    object2.position.y = 120;
+    object2.position.z = 0;
 
-    objects.push(object2)
+    // objects.push(object2)
     objects.push(clothObject)
 
     scene.add(object)
-    scene.add(object2)
+    // scene.add(object2)
+
+    // console.log(objects[0]);
+
 
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('mousedown', onMouseDown);
@@ -345,11 +345,11 @@ function onMouseDown(event) {
     // convert 2D mouse Coordinate System to THREE.JS Coordinate System
     // mouse(x,y) ==> THREE.js(x,y,0)
 
-    var vector = new THREE.Vector3();
+    let vector = new THREE.Vector3();
     vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
     vector.unproject(camera);
-    var dir = vector.sub(camera.position).normalize();
-    var distance = - camera.position.z / dir.z;
+    let dir = vector.sub(camera.position).normalize();
+    let distance = - camera.position.z / dir.z;
     mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
     closestParticleIndex = getClosestParticle(cloth.particles, mousePosition)
@@ -359,20 +359,21 @@ function onMouseDown(event) {
 
 function onMouseMove(event) {
 
-    if (selected) {
-        var vector = new THREE.Vector3();
-        vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
-        vector.unproject(camera);
-        var dir = vector.sub(camera.position).normalize();
-        var distance = - camera.position.z / dir.z;
-        mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
-        // move all objects except Cloth
-        if (!clothSelected) {
-            selected.position.copy(mousePosition)
-        }
+    let vector = new THREE.Vector3();
+    vector.set((event.clientX / window.innerWidth) * 2 - 1, - (event.clientY / window.innerHeight) * 2 + 1, 0.5);
+    vector.unproject(camera);
+    let dir = vector.sub(camera.position).normalize();
+    let distance = - camera.position.z / dir.z;
+    mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
-    }
+    // move any selected object except Cloth
+    // if (selected && !clothSelected) {
+    //     // mousePosition.setZ(selected.position.z)
+    //     selected.position.copy(mousePosition)
+    // }
+
+
 
 }
 
@@ -398,6 +399,15 @@ function getClosestParticle(particles, mousePosition) {
     }
 
     return index
+}
+
+function isIntersectWithSphere(point, spherePosition) {
+
+    if (point.distanceTo(spherePosition) < radius) {
+        // console.log('collision');
+
+    }
+
 }
 
 function calculateSize(object) {
@@ -616,6 +626,16 @@ function simulate(time) {
     if (clothSelected) {
         particles[closestParticleIndex].position.copy(mousePosition)
     }
+
+    // Detect Collision
+
+    // console.log(particles)
+
+    for (let i = 0; i < particles.length; i++) {
+
+        isIntersectWithSphere(particles[i].position, object.position)
+    }
+
 
     // Start Constrains
 
