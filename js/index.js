@@ -63,6 +63,7 @@ var objects = [];
 var closestParticleIndex
 var cube
 var thing = 'None'
+var moveWithMouse = false
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -247,6 +248,7 @@ function setup() {
             this.showPoles = showPoles
             this.thing = thing;
             this.pinned = pinned;
+            this.moveWithMouse = moveWithMouse
 
             this.avoidClothSelfIntersection = avoidClothSelfIntersection;
 
@@ -282,7 +284,8 @@ function setup() {
         f4.add(guiControls, 'rotate').name('Auto Rotate').onChange(function (value) { rotate = value; });
         f4.add(guiControls, 'wind').name('Wind').onChange(function (value) { wind = value; });
         f4.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { showPoles = value; modifyPoles() });
-        f4.add(guiControls, 'thing', ['None', 'Sphere', 'Cube']).name('Object').onChange(function (value) { showObject(value); });
+        f4.add(guiControls, 'moveWithMouse').name('Move With Mouse').onChange(function (value) { enableMoveWithMouse(value); });
+        f4.add(guiControls, 'thing', ['None', 'Sphere', 'Cube', 'All']).name('Object').onChange(function (value) { showObject(value) });
         f4.add(guiControls, 'pinned', ['None', 'Corners', 'OneEdge', 'TwoEdges', 'FourEdges', 'Random']).name('Pinned').onChange(function (value) { pinCloth(value); });
 
         let f1 = gui.addFolder('Behavior');
@@ -361,10 +364,10 @@ function onMouseMove(event) {
     mousePosition = camera.position.clone().add(dir.multiplyScalar(distance));
 
     // move any selected object except Cloth
-    // if (selected && !clothSelected) {
-    //     mousePosition.setZ(selected.position.z)
-    //     selected.position.copy(mousePosition)
-    // }
+    if (selected && !clothSelected) {
+        mousePosition.setZ(selected.position.z)
+        selected.position.copy(mousePosition)
+    }
 
 
 
@@ -511,16 +514,31 @@ function pinCloth(choice) {
 
 function showObject(object) {
     if (object == 'None') {
-        sphere.visible = !sphere.visible
-        cube.visible = !cube.visible
+        sphere.visible = false
+        cube.visible = false
     }
     else if (object == 'Sphere') {
-        sphere.visible = !sphere.visible
+        sphere.visible = true
         cube.visible = false
     }
     else if (object == 'Cube') {
-        cube.visible = !cube.visible
+        cube.visible = true
         sphere.visible = false
+    }
+    else {
+        cube.visible = true
+        sphere.visible = true
+    }
+}
+
+function enableMoveWithMouse(enable) {
+    if (enable) {
+        objects.push(sphere)
+        objects.push(cube)
+    }
+    else {
+        objects.pop()
+        objects.pop()
     }
 }
 
