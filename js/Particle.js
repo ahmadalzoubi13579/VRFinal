@@ -37,6 +37,7 @@ class Particle {
 
     };
 
+    
 
     // Performs verlet integration
     integrate(timesq) {
