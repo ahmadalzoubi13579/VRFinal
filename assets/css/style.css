@@ -1,9 +1,6 @@
 @font-face {
     font-family: "Montserrat-Regular";
-    src: local("Montserrat"),
-         url('../fonts/Montserrat-Regular.eot') format('eot'),
-         url('../fonts/Montserrat-Regular.woff') format('woff'),
-         url('../fonts/Montserrat-Regular.ttf') format('truetype');
+    src: local("Montserrat"), url('../fonts/Montserrat-Regular.eot') format('eot'), url('../fonts/Montserrat-Regular.woff') format('woff'), url('../fonts/Montserrat-Regular.ttf') format('truetype');
 }
 
 body {
@@ -13,6 +10,7 @@ body {
     margin: 0px;
     overflow: hidden;
     user-select: none;
+    font-size: 50px
 }
 
 #info {
@@ -22,13 +20,25 @@ body {
     /* text-align: center; */
 }
 
-
 a {
     text-decoration: none;
     cursor: pointer;
 }
 
-#stats { position: absolute; top:0; left: 0 }
-#stats #fps { background: transparent !important }
-#stats #fps #fpsText { color: #aaa !important }
-#stats #fps #fpsGraph { display: true }
+#stats {
+    position: absolute;
+    top: 0;
+    left: 0
+}
+
+#stats #fps {
+    background: transparent !important
+}
+
+#stats #fps #fpsText {
+    color: #aaa !important
+}
+
+#stats #fps #fpsGraph {
+    display: true
+}

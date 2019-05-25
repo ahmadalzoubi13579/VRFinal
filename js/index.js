@@ -7,7 +7,7 @@ var scene
 var camera, light, clothObject
 var loader, clothTexture, clothMaterial, clothGeometry
 var cloth
-var fabricLength = 400;
+var fabricLength = 300;
 var clothWidth = Math.round(fabricLength / 20)
 var clothHeight = Math.round(fabricLength / 20)
 var particles = [];
@@ -167,16 +167,16 @@ function setup() {
     poleMat = new THREE.MeshPhongMaterial({ color: 0x595959, specular: 0x111111, shininess: 100, side: THREE.DoubleSide });
 
     poleRight = new THREE.Mesh(poleGeo, poleMat);
-    poleRight.position.x = 200;
-    poleRight.position.z = -200;
+    poleRight.position.x = 153;
+    poleRight.position.z = -150;
     poleRight.position.y = -(125 - 125 / 2);
     poleRight.receiveShadow = true;
     poleRight.castShadow = true;
     scene.add(poleRight);
 
     poleLeft = new THREE.Mesh(poleGeo, poleMat);
-    poleLeft.position.x = -200;
-    poleLeft.position.z = -200;
+    poleLeft.position.x = -153;
+    poleLeft.position.z = -150;
     poleLeft.position.y = -62;
     poleLeft.receiveShadow = true;
     poleLeft.castShadow = true;
@@ -272,8 +272,8 @@ function setup() {
         };
 
         gui = new dat.GUI();
-        gui.closed = true
-        gui.width = 270
+        gui.closed = false
+        // gui.width = 370
 
         // console.log(gui)
 
