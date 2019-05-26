@@ -58,14 +58,14 @@ let spherePrevPosition
 
 let sphere
 let object2
-let radius = 40
+let radius = 50
 let selected
 let clothSelected
 let mousePosition = new THREE.Vector3()
 let objects = [];
 let closestParticleIndex
 let cube
-let thing = 'None'
+let thing = 'Sphere'
 let moveWithMouse = false
 
 //////////////////////////////////////////////////////////////////////////////
@@ -212,13 +212,13 @@ function setup() {
     scene.add(clothObject)
     objects.push(clothObject)
 
-    let sphereGeometry = new THREE.SphereGeometry(radius, 24, 24);
+    let sphereGeometry = new THREE.SphereGeometry(radius, 20, 20);
     sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     sphereMaterial.transparent = true;
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     radius = 40;
-    spherePosition = new THREE.Vector3(100, 10, -150);
-    spherePrevPosition = new THREE.Vector3(100, 10, -150);
+    spherePosition = new THREE.Vector3(0, 0, -150);
+    spherePrevPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
     scene.add(sphere)
 
@@ -231,7 +231,7 @@ function setup() {
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
 
     pinCloth('OneEdge');
-    showObject('None')
+    showObject('Sphere')
 
     document.body.appendChild(renderer.domElement);
 
@@ -400,7 +400,7 @@ function getClosestParticle(particles, mousePosition) {
     return index
 }
 
-function isIntersectWithSphere(point, spherePosition) {
+function isIntersectWithSphere(point) {
 
     // let diff = new THREE.Vector3()
     // let posNoFriction = new THREE.Vector3()
@@ -434,8 +434,8 @@ function isIntersectWithSphere(point, spherePosition) {
     let whereWasI = particle.previous;
     let ballPosition = spherePosition
     let prevBallPosition = spherePrevPosition
-    let posNoFriction = new THREE.Vector3()
-    let posFriction = new THREE.Vector3()
+    let posNoFriction = new THREE.Vector3(0, 0, 0)
+    let posFriction = new THREE.Vector3(0, 0, 0)
 
     // console.log(prevBallPosition)
 
@@ -470,6 +470,8 @@ function isIntersectWithSphere(point, spherePosition) {
         else {
             whereAmI.copy(posNoFriction);
         }
+
+
 
     }
 
@@ -723,37 +725,26 @@ function simulate(time) {
 
     }
 
-    
+
     for (i = 0; i < cloth.particles.length; i++) {
         particle = particles[i];
         particle.addForce(gravity);
         particle.integrate(TIMESTEP_SQ); // performs verlet integration
     }
-    
+
     // mvoe cloth with mouse
 
     if (clothSelected) {
         particles[closestParticleIndex].position.copy(mousePosition)
     }
 
-    if (sphere.visible) {
-        for (let i = 0; i < particles.length; i++) {
-
-            isIntersectWithSphere(particles[i], sphere.position)
-        }
-    }
-    // Detect Collision
-
-    // console.log(particles)
 
 
-    if (cube.visible) {
-        for (let i = 0; i < particles.length; i++) {
-
-            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
-        }
-
-    }
+    // spherePrevPosition.copy(spherePosition);
+    // spherePosition.y = 50 * Math.sin(Date.now() / 600);
+    // spherePosition.x = 50 * Math.sin(Date.now() / 600);
+    // spherePosition.z = 50 * Math.cos(Date.now() / 600);
+    // sphere.position.copy(spherePosition);
 
 
     // Start Constrains
@@ -781,6 +772,27 @@ function simulate(time) {
                 cloth.repelParticles(p_i, p_j, restDistance);
             }
         }
+    }
+
+    if (sphere.visible) {
+        for (let i = 0; i < particles.length; i++) {
+
+            isIntersectWithSphere(particles[i])
+
+            
+        }
+    }
+    // Detect Collision
+
+    // console.log(particles)
+
+
+    if (cube.visible) {
+        for (let i = 0; i < particles.length; i++) {
+
+            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
+        }
+
     }
 
     // Pin Constrains
