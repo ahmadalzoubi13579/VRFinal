@@ -393,6 +393,8 @@ function isIntersectWithSphere(point) {
 
     if (diff.length() < radius) {
 
+        console.log('sphere collision');
+
         diff.normalize().multiplyScalar(radius)
         posNoFriction.copy(spherePosition).add(diff)
         point.copy(posNoFriction)
@@ -663,62 +665,55 @@ function simulate(time) {
         particles[closestParticleIndex].position.copy(mousePosition)
     }
 
-
-
-    // spherePrevPosition.copy(spherePosition);
+    // // spherePrevPosition.copy(spherePosition);
     // spherePosition.y = 50 * Math.sin(Date.now() / 600);
     // spherePosition.x = 50 * Math.sin(Date.now() / 600);
     // spherePosition.z = 50 * Math.cos(Date.now() / 600);
     // sphere.position.copy(spherePosition);
 
 
+
     // Start Constrains
 
-    constrains = cloth.constrains,
-        il = constrains.length;
+    constrains = cloth.constrains
+    il = constrains.length;
+
     for (i = 0; i < il; i++) {
         constrain = constrains[i];
         cloth.satisifyConstrains(constrain[0], constrain[1], constrain[2]);
     }
 
-    // Floor Constains
-    for (particles = cloth.particles, i = 0, il = particles.length
-        ; i < il; i++) {
+    for (let i = 0; i < particles.length; i++) {
+
+        // sphere collision handling
+        if (sphere.visible) {
+            isIntersectWithSphere(particles[i].position)
+
+        }
+
+        // cube collision handling
+        if (cube.visible) {
+            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
+
+
+        }
+
+        // floor constraint
         particle = particles[i];
         pos = particle.position;
         if (pos.y < - 249) { pos.y = - 249; }
-    }
 
-    if (avoidClothSelfIntersection) {
-        for (i = 0; i < particles.length; i++) {
+        // avoid self intersection
+        if (avoidClothSelfIntersection) {
             p_i = particles[i];
             for (j = 0; j < particles.length; j++) {
                 p_j = particles[j];
                 cloth.repelParticles(p_i, p_j, restDistance);
             }
         }
-    }
-
-    if (sphere.visible) {
-        for (let i = 0; i < particles.length; i++) {
-
-            isIntersectWithSphere(particles[i].position)
-
-            
-        }
-    }
-    // Detect Collision
-
-    // console.log(particles)
-
-
-    if (cube.visible) {
-        for (let i = 0; i < particles.length; i++) {
-
-            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
-        }
 
     }
+
 
     // Pin Constrains
     if (cornersPinned) {
