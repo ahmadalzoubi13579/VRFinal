@@ -54,7 +54,7 @@ let intersects
 let sphereMaterial
 let cubeMaterial
 let spherePosition
-let spherePrevPosition
+let prevBallPosition
 
 let sphere
 let object2
@@ -69,20 +69,6 @@ let thing = 'Sphere'
 let moveWithMouse = false
 
 //////////////////////////////////////////////////////////////////////////////
-
-
-// let ballSize = 500 / 4; //40
-// let ballPosition = new THREE.Vector3(0, -250 + ballSize, 0);
-// let prevBallPosition = new THREE.Vector3(0, -250 + ballSize, 0);
-
-
-// // let ray = new THREE.Raycaster();
-// // let collisionResults, newCollisionResults;
-// let whereAmI, whereWasI;
-// // let directionOfMotion, distanceTraveled;
-
-// let posFriction = new THREE.Vector3(0, 0, 0);
-// let posNoFriction = new THREE.Vector3(0, 0, 0);
 
 // let objectCenter = new THREE.Vector3();
 
@@ -216,9 +202,8 @@ function setup() {
     sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     sphereMaterial.transparent = true;
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    radius = 40;
     spherePosition = new THREE.Vector3(0, 0, -150);
-    spherePrevPosition = new THREE.Vector3(0, 0, -150);
+    prevBallPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
     scene.add(sphere)
 
@@ -402,78 +387,18 @@ function getClosestParticle(particles, mousePosition) {
 
 function isIntersectWithSphere(point) {
 
-    // let diff = new THREE.Vector3()
-    // let posNoFriction = new THREE.Vector3()
-    // diff.subVectors(point.position, spherePosition);
+    let diff = new THREE.Vector3()
+    let posNoFriction = new THREE.Vector3()
+    diff.subVectors(point, spherePosition);
 
-    // if (diff.length() < radius) {
-
-    //     console.log('ball collision');
-
-    //     // console.log(spherePosition)
-
-    //     // let diff = radius - point.distanceTo(spherePosition)
-    //     // point.addScalar(diff)
-    //     // // console.log(diff)
-    //     // let newVector = new THREE.Vector3()
-    //     // newVector.copy(point).addScalar(diff)
-    //     // console.log(point)
-    //     // point.addScalar(diff)
-    //     // point.add(newVector)
-
-    //     // diff.normalize().multiplyScalar(radius)
-    //     // posNoFriction.copy(spherePosition).add(diff)
-    //     // point.position.copy(posNoFriction)
-
-
-
-    // }
-
-    let particle = point
-    let whereAmI = particle.position;
-    let whereWasI = particle.previous;
-    let ballPosition = spherePosition
-    let prevBallPosition = spherePrevPosition
-    let posNoFriction = new THREE.Vector3(0, 0, 0)
-    let posFriction = new THREE.Vector3(0, 0, 0)
-
-    // console.log(prevBallPosition)
-
-
-    // check to see if point is inside sphere
-
-
-    diff.subVectors(whereAmI, ballPosition);
     if (diff.length() < radius) {
-        // if yes, we've collided, so take correcting action
 
-        // no friction behavior:
-        // project point out to nearest point on sphere surface
-        diff.normalize().multiplyScalar(radius);
-        posNoFriction.copy(ballPosition).add(diff);
-
-        diff.subVectors(whereWasI, ballPosition);
-
-        if (diff.length() > radius) {
-
-            // console.log('greater than')
-            // with friction behavior:
-            // add the distance that the sphere moved in the last frame
-            // to the previous position of the particle
-            diff.subVectors(ballPosition, prevBallPosition);
-            posFriction.copy(whereWasI).add(diff);
-
-            posNoFriction.multiplyScalar(1 - friction);
-            posFriction.multiplyScalar(friction);
-            whereAmI.copy(posFriction.add(posNoFriction));
-        }
-        else {
-            whereAmI.copy(posNoFriction);
-        }
-
-
+        diff.normalize().multiplyScalar(radius)
+        posNoFriction.copy(spherePosition).add(diff)
+        point.copy(posNoFriction)
 
     }
+
 
 
 }
@@ -777,7 +702,7 @@ function simulate(time) {
     if (sphere.visible) {
         for (let i = 0; i < particles.length; i++) {
 
-            isIntersectWithSphere(particles[i])
+            isIntersectWithSphere(particles[i].position)
 
             
         }
