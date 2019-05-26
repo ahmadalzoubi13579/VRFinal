@@ -1,71 +1,72 @@
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
-// global variables
-var stats
-var renderer
-var scene
-var camera, light, clothObject
-var loader, clothTexture, clothMaterial, clothGeometry
-var cloth
-var fabricLength = 300;
-var clothWidth = Math.round(fabricLength / 20)
-var clothHeight = Math.round(fabricLength / 20)
-var particles = [];
-var restDistanceB = 2;
-var restDistanceS = Math.sqrt(2);
-var restDistance; // = fabricLength/clothWidth;
-var structuralSprings = true;
-var shearSprings = false;
-var bendingSprings = false;
-var DAMPING = 0.03;
-var DRAG = 1 - DAMPING;
-var MASS = .1;
-var wind = false;
-var windStrength;
-var windForce = new THREE.Vector3(0, 0, 0);
-var GRAVITY = 9.81 * 140; //
-var gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS);
-var TIMESTEP = 18 / 1000;
-var TIMESTEP_SQ = TIMESTEP * TIMESTEP;
-var rotate = false;
-var pinned = 'OneEdge';
-var thing = 'Ball'
-var cornersPinned, oneEdgePinned, twoEdgesPinned, fourEdgesPinned, randomEdgesPinned;
-var avoidClothSelfIntersection = true;
-var friction = 0.9; // similar to coefficient of friction. 0 = frictionless, 1 = cloth sticks in place
-var tmpForce = new THREE.Vector3();
-var diff = new THREE.Vector3();
-var randomPoints = [];
-var rand, randX, randY;
-var pos;
-var gui;
-var guiControls;
-var guiEnabled = true;
-var groundTexture
-var groundMaterial
-var mesh
-var poleGeo
-var poleMat
-var poleRight
-var poleLeft
-var showPoles = true
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
-var intersects
-var sphereMaterial
-var cubeMaterial
+// global letiables
+let stats
+let renderer
+let scene
+let camera, light, clothObject
+let loader, clothTexture, clothMaterial, clothGeometry
+let cloth
+let fabricLength = 300;
+let clothWidth = Math.round(fabricLength / 20)
+let clothHeight = Math.round(fabricLength / 20)
+let particles = [];
+let restDistanceB = 2;
+let restDistanceS = Math.sqrt(2);
+let restDistance; // = fabricLength/clothWidth;
+let structuralSprings = true;
+let shearSprings = false;
+let bendingSprings = false;
+let DAMPING = 0.03;
+let DRAG = 1 - DAMPING;
+let MASS = .1;
+let wind = false;
+let windStrength;
+let windForce = new THREE.Vector3(0, 0, 0);
+let GRAVITY = 9.81 * 140; //
+let gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS);
+let TIMESTEP = 18 / 1000;
+let TIMESTEP_SQ = TIMESTEP * TIMESTEP;
+let rotate = false;
+let pinned = 'OneEdge';
+let cornersPinned, oneEdgePinned, twoEdgesPinned, fourEdgesPinned, randomEdgesPinned;
+let avoidClothSelfIntersection = true;
+let friction = 0.9; // similar to coefficient of friction. 0 = frictionless, 1 = cloth sticks in place
+let tmpForce = new THREE.Vector3();
+let diff = new THREE.Vector3();
+let randomPoints = [];
+let rand, randX, randY;
+let pos;
+let gui;
+let guiControls;
+let guiEnabled = true;
+let groundTexture
+let groundMaterial
+let mesh
+let poleGeo
+let poleMat
+let poleRight
+let poleLeft
+let showPoles = true
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let intersects
+let sphereMaterial
+let cubeMaterial
+let spherePosition
+let spherePrevPosition
 
-var sphere
-var object2
-var radius = 40
-var selected
-var clothSelected
-var mousePosition = new THREE.Vector3()
-var objects = [];
-var closestParticleIndex
-var cube
-var thing = 'None'
-var moveWithMouse = false
+let sphere
+let object2
+let radius = 40
+let selected
+let clothSelected
+let mousePosition = new THREE.Vector3()
+let objects = [];
+let closestParticleIndex
+let cube
+let thing = 'None'
+let moveWithMouse = false
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -211,17 +212,17 @@ function setup() {
     scene.add(clothObject)
     objects.push(clothObject)
 
-    var sphereGeometry = new THREE.SphereGeometry(radius, 24, 24);
+    let sphereGeometry = new THREE.SphereGeometry(radius, 24, 24);
     sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     sphereMaterial.transparent = true;
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     radius = 40;
-    sphere.position.x = 100;
-    sphere.position.y = 10;
-    sphere.position.z = -150;
+    spherePosition = new THREE.Vector3(100, 10, -150);
+    spherePrevPosition = new THREE.Vector3(100, 10, -150);
+    sphere.position.copy(spherePosition)
     scene.add(sphere)
 
-    var cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
+    let cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
     cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     cube.position.z = -200
@@ -309,7 +310,7 @@ function setup() {
     }
 
 
-    // var dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
+    // let dragControls = new THREE.DragControls(objects, camera, renderer.domElement);
     // dragControls.addEventListener('dragstart', function () {
     //     // controls.enabled = false;
     //     console.log('start')
@@ -401,28 +402,74 @@ function getClosestParticle(particles, mousePosition) {
 
 function isIntersectWithSphere(point, spherePosition) {
 
-    let diff = new THREE.Vector3()
+    // let diff = new THREE.Vector3()
+    // let posNoFriction = new THREE.Vector3()
+    // diff.subVectors(point.position, spherePosition);
+
+    // if (diff.length() < radius) {
+
+    //     console.log('ball collision');
+
+    //     // console.log(spherePosition)
+
+    //     // let diff = radius - point.distanceTo(spherePosition)
+    //     // point.addScalar(diff)
+    //     // // console.log(diff)
+    //     // let newVector = new THREE.Vector3()
+    //     // newVector.copy(point).addScalar(diff)
+    //     // console.log(point)
+    //     // point.addScalar(diff)
+    //     // point.add(newVector)
+
+    //     // diff.normalize().multiplyScalar(radius)
+    //     // posNoFriction.copy(spherePosition).add(diff)
+    //     // point.position.copy(posNoFriction)
+
+
+
+    // }
+
+    let particle = point
+    let whereAmI = particle.position;
+    let whereWasI = particle.previous;
+    let ballPosition = spherePosition
+    let prevBallPosition = spherePrevPosition
     let posNoFriction = new THREE.Vector3()
-    diff.subVectors(point.position, spherePosition);
+    let posFriction = new THREE.Vector3()
 
+    // console.log(prevBallPosition)
+
+
+    // check to see if point is inside sphere
+
+
+    diff.subVectors(whereAmI, ballPosition);
     if (diff.length() < radius) {
+        // if yes, we've collided, so take correcting action
 
-        console.log('ball collision');
+        // no friction behavior:
+        // project point out to nearest point on sphere surface
+        diff.normalize().multiplyScalar(radius);
+        posNoFriction.copy(ballPosition).add(diff);
 
-        // console.log(spherePosition)
+        diff.subVectors(whereWasI, ballPosition);
 
-        // let diff = radius - point.distanceTo(spherePosition)
-        // point.addScalar(diff)
-        // // console.log(diff)
-        // let newVector = new THREE.Vector3()
-        // newVector.copy(point).addScalar(diff)
-        // console.log(point)
-        // point.addScalar(diff)
-        // point.add(newVector)
+        if (diff.length() > radius) {
 
-        diff.normalize().multiplyScalar(radius)
-        posNoFriction.copy(spherePosition).add(diff)
-        point.position.copy(posNoFriction)
+            // console.log('greater than')
+            // with friction behavior:
+            // add the distance that the sphere moved in the last frame
+            // to the previous position of the particle
+            diff.subVectors(ballPosition, prevBallPosition);
+            posFriction.copy(whereWasI).add(diff);
+
+            posNoFriction.multiplyScalar(1 - friction);
+            posFriction.multiplyScalar(friction);
+            whereAmI.copy(posFriction.add(posNoFriction));
+        }
+        else {
+            whereAmI.copy(posNoFriction);
+        }
 
     }
 
@@ -442,12 +489,12 @@ function isIntersectWithCube(point, cubePosition, width, height, depth) {
 
 function calculateSize(object) {
 
-    var objectList = [];
-    var stack = [object];
-    var bytes = 0;
+    let objectList = [];
+    let stack = [object];
+    let bytes = 0;
 
     while (stack.length) {
-        var value = stack.pop();
+        let value = stack.pop();
 
         if (typeof value === 'boolean') {
             bytes += 4;
@@ -465,7 +512,7 @@ function calculateSize(object) {
         ) {
             objectList.push(value);
 
-            for (var i in value) {
+            for (let i in value) {
                 stack.push(value[i]);
             }
         }
@@ -676,12 +723,13 @@ function simulate(time) {
 
     }
 
+    
     for (i = 0; i < cloth.particles.length; i++) {
         particle = particles[i];
         particle.addForce(gravity);
         particle.integrate(TIMESTEP_SQ); // performs verlet integration
     }
-
+    
     // mvoe cloth with mouse
 
     if (clothSelected) {
@@ -689,7 +737,6 @@ function simulate(time) {
     }
 
     if (sphere.visible) {
-
         for (let i = 0; i < particles.length; i++) {
 
             isIntersectWithSphere(particles[i], sphere.position)
@@ -701,7 +748,6 @@ function simulate(time) {
 
 
     if (cube.visible) {
-
         for (let i = 0; i < particles.length; i++) {
 
             isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
