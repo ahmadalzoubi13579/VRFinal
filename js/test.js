@@ -35,4 +35,26 @@
 
 // console.log(face);
 
+// var x = [
+//     {
+//         name : 'ahmad'
+//     },
+//     {
+//         name:'mohammad'
+//     }
+// ]
+
+// function calc(val) {
+//     val = 'emad'
+//     console.log('val : ' + val);
+// }
+
+// console.log(x)
+// calc(x[1].name)
+// console.log(x)
+
+// var point = new THREE.Vector3(10, 10, 10)
+// point.addScalar(3.7)
+// console.log(point)
+
 
