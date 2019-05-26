@@ -401,24 +401,28 @@ function getClosestParticle(particles, mousePosition) {
 
 function isIntersectWithSphere(point, spherePosition) {
 
-    if (point.distanceToSquared(spherePosition) < radius * radius) {
-        
+    let diff = new THREE.Vector3()
+    let posNoFriction = new THREE.Vector3()
+    diff.subVectors(point.position, spherePosition);
+
+    if (diff.length() < radius) {
+
         console.log('ball collision');
 
         // console.log(spherePosition)
 
         // let diff = radius - point.distanceTo(spherePosition)
+        // point.addScalar(diff)
         // // console.log(diff)
-        // // let newVector = new THREE.Vector3()
-        // // newVector.copy(point).normalize().multiplyScalar(diff)
+        // let newVector = new THREE.Vector3()
+        // newVector.copy(point).addScalar(diff)
         // console.log(point)
         // point.addScalar(diff)
         // point.add(newVector)
 
-        let diff = new THREE.Vector3()
-        diff.subVectors(point, spherePosition)
         diff.normalize().multiplyScalar(radius)
-        point.add(diff)
+        posNoFriction.copy(spherePosition).add(diff)
+        point.position.copy(posNoFriction)
 
     }
 
@@ -688,7 +692,7 @@ function simulate(time) {
 
         for (let i = 0; i < particles.length; i++) {
 
-            isIntersectWithSphere(particles[i].position, sphere.position)
+            isIntersectWithSphere(particles[i], sphere.position)
         }
     }
     // Detect Collision
