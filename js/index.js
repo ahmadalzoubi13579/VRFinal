@@ -55,7 +55,12 @@ let sphereMaterial
 let cubeMaterial
 let spherePosition
 let prevBallPosition
-
+let a
+let b
+let c
+let d
+let e
+let f
 let sphere
 let object2
 let radius = 50
@@ -65,8 +70,9 @@ let mousePosition = new THREE.Vector3()
 let objects = [];
 let closestParticleIndex
 let cube
-let thing = 'Sphere'
+let thing = 'Cube'
 let moveWithMouse = false
+let cubeBoundingBox
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -106,11 +112,11 @@ function setup() {
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
 
-    let d = 500;
-    light.shadow.camera.left = -d;
-    light.shadow.camera.right = d;
-    light.shadow.camera.top = d;
-    light.shadow.camera.bottom = -d;
+    let dir = 500;
+    light.shadow.camera.left = -dir;
+    light.shadow.camera.right = dir;
+    light.shadow.camera.top = dir;
+    light.shadow.camera.bottom = -dir;
     light.shadow.camera.far = 1000;
     scene.add(light);
 
@@ -179,7 +185,7 @@ function setup() {
         specular: 0x030303,
         wireframeLinewidth: 2,
         side: THREE.DoubleSide,
-        alphaTest: 0.5
+        alphaTest: 0.5,
     });
 
     clothGeometry = new THREE.ParametricGeometry(clothInitialPosition, clothWidth, clothHeight);
@@ -199,24 +205,45 @@ function setup() {
     objects.push(clothObject)
 
     let sphereGeometry = new THREE.SphereGeometry(radius, 20, 20);
-    sphereMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
-    sphereMaterial.transparent = true;
+    sphereMaterial = new THREE.MeshPhongMaterial({
+        color: 0xe8a451,
+        side: THREE.DoubleSide,
+        transparent: true,
+        // opacity:0.8
+    });
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     spherePosition = new THREE.Vector3(0, 0, -150);
     prevBallPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
     scene.add(sphere)
 
+    // var box = new THREE.BoxHelper(sphere, 0x6bcf30);
+    // scene.add(box);
+
     let cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
     cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
     cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.z = -200
+    // cube.position.z = -100
     scene.add(cube);
+
+    // console.log(cube.position)
+
+    cubeGeometry.computeBoundingBox();
+    cubeBoundingBox = cube.geometry.boundingBox.clone();
+
+    // console.log(cubeBoundingBox);
+
+    a = cubeBoundingBox.min.x;
+    b = cubeBoundingBox.min.y;
+    c = cubeBoundingBox.min.z;
+    d = cubeBoundingBox.max.x;
+    e = cubeBoundingBox.max.y;
+    f = cubeBoundingBox.max.z;
 
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
 
     pinCloth('OneEdge');
-    showObject('Sphere')
+    showObject('Cube')
 
     document.body.appendChild(renderer.domElement);
 
@@ -385,19 +412,20 @@ function getClosestParticle(particles, mousePosition) {
     return index
 }
 
-function isIntersectWithSphere(point) {
+function isParticleIntersectWithSphere(particle) {
 
     let diff = new THREE.Vector3()
     let posNoFriction = new THREE.Vector3()
-    diff.subVectors(point, spherePosition);
+    diff.subVectors(particle.position, spherePosition);
 
     if (diff.length() < radius) {
 
-        console.log('sphere collision');
+        // console.log('sphere collision');
 
         diff.normalize().multiplyScalar(radius)
         posNoFriction.copy(spherePosition).add(diff)
-        point.copy(posNoFriction)
+        particle.position.copy(posNoFriction)
+        // particle.previous.multiplyScalar(friction)
 
     }
 
@@ -405,14 +433,72 @@ function isIntersectWithSphere(point) {
 
 }
 
-function isIntersectWithCube(point, cubePosition, width, height, depth) {
+function isSpringIntersectWithSphere(spring) {
 
-    if ((point.x >= cubePosition.x - width / 2 && point.x <= cubePosition.x + width / 2) &&
-        (point.y >= cubePosition.y - height / 2 && point.y <= cubePosition.y + height / 2) &&
-        (point.z >= cubePosition.z - depth / 2 && point.z <= cubePosition.z + depth / 2)
+    let p1 = spring[0].position
+    let p2 = spring[1].position
 
-    ) {
-        console.log('cube collistion')
+    // console.log(p1);
+
+
+    let orthognol = new THREE.Vector3()
+    orthognol.subVectors(p1, p2)
+
+    let radiusPos = new THREE.Vector3()
+    radiusPos.copy(spherePosition).addScalar(radius)
+
+    if (orthognol.dot(radiusPos)) {
+        console.log('ok');
+    }
+
+}
+
+function isIntersectWithCube(particle, cubePosition, width, height, depth) {
+
+    if ((particle.position.x >= cubePosition.x - width / 2 && particle.position.x <= cubePosition.x + width / 2) &&
+        (particle.position.y >= cubePosition.y - height / 2 && particle.position.y <= cubePosition.y + height / 2) &&
+        (particle.position.z >= cubePosition.z - depth / 2 && particle.position.z <= cubePosition.z + depth / 2)) {
+
+        // console.log('cube collistion')
+        let currentX = particle.position.x;
+        let currentY = particle.position.y;
+        let currentZ = particle.position.z;
+
+        let nearestX
+        let nearestY
+        let nearestZ
+
+        let posNoFriction = new THREE.Vector3()
+        let posFriction = new THREE.Vector3()
+
+        if (currentX <= (a + d) / 2) { nearestX = a; }
+        else { nearestX = d; }
+
+        if (currentY <= (b + e) / 2) { nearestY = b; }
+        else { nearestY = e; }
+
+        if (currentZ <= (c + f) / 2) { nearestZ = c; }
+        else { nearestZ = f; }
+
+        let xDist = Math.abs(nearestX - currentX);
+        let yDist = Math.abs(nearestY - currentY);
+        let zDist = Math.abs(nearestZ - currentZ);
+
+        posNoFriction.copy(particle.position);
+
+        if (zDist <= xDist && zDist <= yDist) {
+            posNoFriction.z = nearestZ;
+        }
+        else if (yDist <= xDist && yDist <= zDist) {
+            posNoFriction.y = nearestY;
+        }
+        else if (xDist <= yDist && xDist <= zDist) {
+            posNoFriction.x = nearestX;
+        }
+        
+        particle.position.copy(posNoFriction);
+
+
     }
 }
 
@@ -578,9 +664,9 @@ function modifyPoles() {
 
 function wireFrame() {
 
-    // cubeMaterial.wireframe = !cubeMaterial.wireframe;
+    cubeMaterial.wireframe = !cubeMaterial.wireframe;
     clothMaterial.wireframe = !clothMaterial.wireframe;
-    // sphereMaterial.wireframe = !sphereMaterial.wireframe;
+    sphereMaterial.wireframe = !sphereMaterial.wireframe;
 
 }
 
@@ -687,15 +773,12 @@ function simulate(time) {
 
         // sphere collision handling
         if (sphere.visible) {
-            isIntersectWithSphere(particles[i].position)
-
+            isParticleIntersectWithSphere(particles[i])
         }
 
         // cube collision handling
         if (cube.visible) {
-            isIntersectWithCube(particles[i].position, cube.position, 100, 100, 200)
-
-
+            isIntersectWithCube(particles[i], cube.position, 100, 100, 200)
         }
 
         // floor constraint
@@ -713,6 +796,13 @@ function simulate(time) {
         }
 
     }
+
+    // for (let i = 0; i < cloth.constrains.length; i++){
+
+    //     // isSpringIntersectWithSphere(cloth.constrains[i])
+
+    //     // console.log('hello');
+    // }
 
 
     // Pin Constrains

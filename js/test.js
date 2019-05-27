@@ -57,4 +57,17 @@
 // point.addScalar(3.7)
 // console.log(point)
 
+// let v1 = new THREE.Vector3(10,0,0)
+// let v2 = new THREE.Vector3(0, 10, 1)
+
+// if (clalc(v1,v2) == 0) {
+//     console.log('ok')
+// }
+
+// function clalc(v1, v2) {
+    
+//     return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
+// }
+
+
 
