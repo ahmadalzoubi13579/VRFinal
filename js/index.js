@@ -79,6 +79,7 @@ let moveWithMouse = false
 let cubeBoundingBox
 let wirframe = false
 let drop = false
+let zAxis = -150
 
 function setup() {
 
@@ -230,6 +231,8 @@ function setup() {
     scene.add(cube2);
     cube2.castShadow = true;
 
+    // console.log(cube2.position)
+
     cubeGeometry.computeBoundingBox();
     cubeBoundingBox = cube.geometry.boundingBox.clone();
 
@@ -266,7 +269,7 @@ function setup() {
             this.wireframe = wirframe
             this.drop = drop
             this.thing = thing;
-            this.moveWithMouse = moveWithMouse
+            this.zAxis = zAxis
 
             this.avoidClothSelfIntersection = avoidClothSelfIntersection;
 
@@ -304,6 +307,7 @@ function setup() {
         f1.add(guiControls, 'drop').name('Drop').onChange(function (value) { drop = value; });
         f1.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
         f1.add(guiControls, 'thing', ['None', 'Sphere', 'Cube', 'Arm']).name('Object').onChange(function (value) { showObject(value) });
+        f1.add(guiControls, 'zAxis', -200, -100).name('Z-Axis').onChange(function (value) { zAxis = value; sphere.position.setZ(value); sphere2.position.setZ(value); spherePosition.setZ(value) });
 
         let f2 = gui.addFolder('Structure');
 
