@@ -54,6 +54,7 @@ let intersects
 let sphereMaterial
 let sphereMaterial2
 let cubeMaterial
+let cubeMaterial2
 let spherePosition
 let prevBallPosition
 let a
@@ -73,7 +74,8 @@ let mousePosition = new THREE.Vector3()
 let objects = [];
 let closestParticleIndex
 let cube
-let thing = 'Sphere'
+let cube2
+let thing = 'Cube'
 let moveWithMouse = false
 let cubeBoundingBox
 
@@ -235,10 +237,26 @@ function setup() {
     // scene.add(box);
 
     let cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
-    cubeMaterial = new THREE.MeshPhongMaterial({ color: 0xe8a451 });
+    cubeMaterial = new THREE.MeshPhongMaterial({
+        color: 0xe8a451,
+        side: THREE.DoubleSide,
+        transparent: true,
+        // opacity: 0.9
+    });
     cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
     // cube.position.z = -100
-    scene.add(cube);
+    // scene.add(cube);
+
+    let cubeGeometry2 = new THREE.BoxGeometry(70, 70, 150);
+    cubeMaterial2 = new THREE.MeshPhongMaterial({
+        color: 0xe8a451,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9
+    });
+    cube2 = new THREE.Mesh(cubeGeometry2, cubeMaterial2);
+    // cube.position.z = -100
+    scene.add(cube2);
 
     // console.log(cube.position)
 
@@ -257,7 +275,7 @@ function setup() {
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
 
     pinCloth('OneEdge');
-    showObject('Sphere')
+    showObject('Cube')
 
     document.body.appendChild(renderer.domElement);
 
@@ -469,10 +487,11 @@ function isSpringIntersectWithSphere(spring) {
 
 function isIntersectWithCube(particle, cubePosition, width, height, depth) {
 
-    if ((particle.position.x >= cubePosition.x - width / 2 && particle.position.x <= cubePosition.x + width / 2) &&
-        (particle.position.y >= cubePosition.y - height / 2 && particle.position.y <= cubePosition.y + height / 2) &&
-        (particle.position.z >= cubePosition.z - depth / 2 && particle.position.z <= cubePosition.z + depth / 2)) {
+    // if ((particle.position.x >= cubePosition.x - width / 2 && particle.position.x <= cubePosition.x + width / 2) &&
+    //     (particle.position.y >= cubePosition.y - height / 2 && particle.position.y <= cubePosition.y + height / 2) &&
+    //     (particle.position.z >= cubePosition.z - depth / 2 && particle.position.z <= cubePosition.z + depth / 2)) {
 
+    if (cubeBoundingBox.containsPoint(particle.position)) {
         // console.log('cube collistion')
         let currentX = particle.position.x;
         let currentY = particle.position.y;
@@ -510,7 +529,17 @@ function isIntersectWithCube(particle, cubePosition, width, height, depth) {
             posNoFriction.x = nearestX;
         }
 
-        particle.position.copy(posNoFriction);
+        if (!cubeBoundingBox.containsPoint(particle.previous)) {
+            // with friction behavior:
+            // set particle to its previous position
+            posFriction.copy(particle.previous);
+            particle.position.copy(posFriction.multiplyScalar(friction).add(posNoFriction.multiplyScalar(1 - friction)));
+        }
+        else {
+            particle.position.copy(posNoFriction);
+        }
+
+        // particle.position.copy(posNoFriction);
 
 
     }
@@ -614,19 +643,27 @@ function pinCloth(choice) {
 function showObject(object) {
     if (object == 'None') {
         sphere.visible = false
+        sphere2.visible = false
         cube.visible = false
+        cube2.visible = false
     }
     else if (object == 'Sphere') {
         sphere.visible = true
+        sphere2.visible = true
         cube.visible = false
+        cube2.visible = false
     }
     else if (object == 'Cube') {
         cube.visible = true
+        cube2.visible = true
         sphere.visible = false
+        sphere2.visible = false
     }
     else {
-        cube.visible = true
         sphere.visible = true
+        sphere2.visible = true
+        cube.visible = true
+        cube2.visible = true
     }
 }
 
