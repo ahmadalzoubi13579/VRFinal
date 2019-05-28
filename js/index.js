@@ -28,7 +28,6 @@ let gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS);
 let TIMESTEP = 18 / 1000;
 let TIMESTEP_SQ = TIMESTEP * TIMESTEP;
 let rotate = false;
-let pinned = 'OneEdge';
 // let cornersPinned, oneEdgePinned, twoEdgesPinned, fourEdgesPinned, randomEdgesPinned;
 let avoidClothSelfIntersection = true;
 let friction = 0.9; // similar to coefficient of friction. 0 = frictionless, 1 = cloth sticks in place
@@ -75,7 +74,7 @@ let objects = [];
 let closestParticleIndex
 let cube
 let cube2
-let thing = 'Arm'
+let thing = 'None'
 let moveWithMouse = false
 let cubeBoundingBox
 let wirframe = false
@@ -281,7 +280,6 @@ function setup() {
             this.wireframe = wirframe
             this.drop = drop
             this.thing = thing;
-            this.pinned = pinned;
             this.moveWithMouse = moveWithMouse
 
             this.avoidClothSelfIntersection = avoidClothSelfIntersection;
@@ -332,7 +330,7 @@ function setup() {
 
         f3.add(guiControls, 'friction', 0, 1).name('Friction').onChange(function (value) { friction = value; });
         f3.add(guiControls, 'damping', 0.01, 0.1).name('Damping').onChange(function (value) { DAMPING = value; DRAG = 1 - DAMPING });
-        f3.add(guiControls, 'mass', 0.1, 0.7).name('Mass').onChange(function (value) { MASS = value; gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS); });
+        f3.add(guiControls, 'mass', 0.1, 0.7).name('Mass').onChange(function (value) { MASS = value; gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS); restartCloth() });
 
 
         let f4 = gui.addFolder('Style');
