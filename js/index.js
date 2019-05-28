@@ -210,17 +210,11 @@ function setup() {
     objects.push(clothObject)
 
     let sphereGeometry = new THREE.SphereGeometry(radius, 20, 20);
-    sphereMaterial = new THREE.MeshPhongMaterial({
-        color: 0xe8a451,
-        side: THREE.DoubleSide,
-        transparent: true,
-        // opacity: 0
-    });
+    sphereMaterial = new THREE.MeshPhongMaterial();
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     spherePosition = new THREE.Vector3(0, 0, -150);
     prevBallPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
-    // scene.add(sphere)
 
     let sphereGeometry2 = new THREE.SphereGeometry(radius2, 20, 20);
     sphereMaterial2 = new THREE.MeshPhongMaterial({
@@ -232,38 +226,25 @@ function setup() {
     sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
     sphere2.position.copy(spherePosition)
     scene.add(sphere2)
-
-    // var box = new THREE.BoxHelper(sphere, 0x6bcf30);
-    // scene.add(box);
+    sphere2.castShadow = true
 
     let cubeGeometry = new THREE.BoxGeometry(100, 100, 200);
-    cubeMaterial = new THREE.MeshPhongMaterial({
-        color: 0xe8a451,
-        side: THREE.DoubleSide,
-        transparent: true,
-        // opacity: 0.9
-    });
+    cubeMaterial = new THREE.MeshPhongMaterial();
     cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    // cube.position.z = -100
-    // scene.add(cube);
 
     let cubeGeometry2 = new THREE.BoxGeometry(70, 70, 150);
     cubeMaterial2 = new THREE.MeshPhongMaterial({
         color: 0xe8a451,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.9
+        // opacity: 1
     });
     cube2 = new THREE.Mesh(cubeGeometry2, cubeMaterial2);
-    // cube.position.z = -100
     scene.add(cube2);
-
-    // console.log(cube.position)
+    cube2.castShadow = true;
 
     cubeGeometry.computeBoundingBox();
     cubeBoundingBox = cube.geometry.boundingBox.clone();
-
-    // console.log(cubeBoundingBox);
 
     a = cubeBoundingBox.min.x;
     b = cubeBoundingBox.min.y;
