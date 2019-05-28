@@ -75,7 +75,7 @@ let objects = [];
 let closestParticleIndex
 let cube
 let cube2
-let thing = 'All'
+let thing = 'Arm'
 let moveWithMouse = false
 let cubeBoundingBox
 let wirframe = false
@@ -234,7 +234,7 @@ function setup() {
     cubeMaterial = new THREE.MeshPhongMaterial();
     cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
-    let cubeGeometry2 = new THREE.BoxGeometry(70, 70, 220);
+    let cubeGeometry2 = new THREE.BoxGeometry(75, 75, 220);
     cubeMaterial2 = new THREE.MeshPhongMaterial({
         color: 0xe8a451,
         side: THREE.DoubleSide,
@@ -258,7 +258,7 @@ function setup() {
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
 
     // pinCloth('OneEdge');
-    showObject('All')
+    showObject(thing)
 
     document.body.appendChild(renderer.domElement);
 
@@ -318,7 +318,8 @@ function setup() {
         f1.add(guiControls, 'showPoles').name('Show Poles').onChange(function (value) { modifyPoles(value) });
         f1.add(guiControls, 'wireframe').name('Wirframe').onChange(function (value) { wireFrame() });
         f1.add(guiControls, 'drop').name('Drop').onChange(function (value) { drop = value; });
-        f1.add(guiControls, 'thing', ['None', 'Sphere', 'Cube', 'All']).name('Object').onChange(function (value) { showObject(value) });
+        f1.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
+        f1.add(guiControls, 'thing', ['None', 'Sphere', 'Cube', 'Arm']).name('Object').onChange(function (value) { showObject(value) });
 
         let f2 = gui.addFolder('Structure');
 
@@ -329,10 +330,6 @@ function setup() {
 
         let f3 = gui.addFolder('Physics');
 
-        f3.add(guiControls, 'structuralSprings').name('Structural Springs').onChange(function (value) { structuralSprings = value; restartCloth(); });
-        f3.add(guiControls, 'shearSprings').name('Shear Springs').onChange(function (value) { shearSprings = value; restartCloth(); });
-        f3.add(guiControls, 'bendingSprings').name('Bending Springs').onChange(function (value) { bendingSprings = value; restartCloth(); });
-        f3.add(guiControls, 'avoidClothSelfIntersection').name('Avoid SelfIntersect').onChange(function (value) { avoidClothSelfIntersection = value; });
         f3.add(guiControls, 'friction', 0, 1).name('Friction').onChange(function (value) { friction = value; });
         f3.add(guiControls, 'damping', 0.01, 0.1).name('Damping').onChange(function (value) { DAMPING = value; DRAG = 1 - DAMPING });
         f3.add(guiControls, 'mass', 0.1, 0.7).name('Mass').onChange(function (value) { MASS = value; gravity = new THREE.Vector3(0, - GRAVITY, 0).multiplyScalar(MASS); });
