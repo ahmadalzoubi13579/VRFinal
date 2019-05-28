@@ -324,7 +324,7 @@ function setup() {
 
 
         let f4 = gui.addFolder('Style');
-        
+
         f4.addColor(guiControls, 'clothColor').name('Cloth Color').onChange(function (value) { clothMaterial.color.setHex(value); });
         f4.addColor(guiControls, 'clothSpecular').name('Cloth Reflection').onChange(function (value) { clothMaterial.specular.setHex(value); });
         f4.addColor(guiControls, 'groundColor').name('Ground Color').onChange(function (value) { groundMaterial.color.setHex(value); });
@@ -428,6 +428,8 @@ function isParticleIntersectWithSphere(particle) {
 
     let diff = new THREE.Vector3()
     let posNoFriction = new THREE.Vector3()
+    let posFriction = new THREE.Vector3()
+
     diff.subVectors(particle.position, spherePosition);
 
     if (diff.length() < radius) {
@@ -436,8 +438,27 @@ function isParticleIntersectWithSphere(particle) {
 
         diff.normalize().multiplyScalar(radius)
         posNoFriction.copy(spherePosition).add(diff)
-        particle.position.copy(posNoFriction)
+        // particle.position.copy(posNoFriction)
         // particle.previous.multiplyScalar(friction)
+        diff.subVectors(particle.previous, spherePosition);
+
+
+        if (diff.length() > radius) {
+
+            // console.log('greater than')
+            // with friction behavior:
+            // add the distance that the sphere moved in the last frame
+            // to the previous position of the particle
+            diff.subVectors(spherePosition, prevBallPosition);
+            posFriction.copy(particle.previous).add(diff);
+    
+            posNoFriction.multiplyScalar(1 - friction);
+            posFriction.multiplyScalar(friction);
+            particle.position.copy(posFriction.add(posNoFriction));
+          }
+          else {
+            particle.position.copy(posNoFriction)
+          }
 
     }
 }
@@ -730,6 +751,15 @@ function render() {
 }
 
 function simulate(time) {
+
+
+    prevBallPosition.copy(spherePosition)
+    spherePosition.y = 50 * Math.sin(Date.now() / 600);
+    spherePosition.x = 50 * Math.sin(Date.now() / 600);
+    // spherePosition.z = 50 * Math.cos(Date.now() / 600);
+    
+    sphere.position.copy(spherePosition)
+    sphere2.position.copy(spherePosition)
 
     let i, il, particles, particle, pt, constrains, constrain;
     particles = cloth.particles
