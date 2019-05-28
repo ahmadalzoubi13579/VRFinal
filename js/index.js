@@ -80,6 +80,8 @@ let cubeBoundingBox
 let wirframe = false
 let drop = false
 let zAxis = -150
+let arm = false
+let originalSpherePosition
 
 function setup() {
 
@@ -201,6 +203,7 @@ function setup() {
     sphereMaterial = new THREE.MeshPhongMaterial();
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     spherePosition = new THREE.Vector3(0, 0, -150);
+    originalSpherePosition = new THREE.Vector3(0, 0, -150);
     prevBallPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
 
@@ -451,14 +454,14 @@ function isParticleIntersectWithSphere(particle) {
             // to the previous position of the particle
             diff.subVectors(spherePosition, prevBallPosition);
             posFriction.copy(particle.previous).add(diff);
-    
+
             posNoFriction.multiplyScalar(1 - friction);
             posFriction.multiplyScalar(friction);
             particle.position.copy(posFriction.add(posNoFriction));
-          }
-          else {
+        }
+        else {
             particle.position.copy(posNoFriction)
-          }
+        }
 
     }
 }
@@ -644,18 +647,22 @@ function showObject(object) {
     if (object == 'None') {
         sphere2.visible = false
         cube2.visible = false
+        arm = false
     }
     else if (object == 'Sphere') {
         sphere2.visible = true
         cube2.visible = false
+        arm = false
     }
     else if (object == 'Cube') {
         cube2.visible = true
         sphere2.visible = false
+        arm = false
     }
     else {
         sphere2.visible = true
         cube2.visible = true
+        arm = true
     }
 }
 
@@ -754,10 +761,15 @@ function simulate(time) {
 
 
     prevBallPosition.copy(spherePosition)
-    spherePosition.y = 50 * Math.sin(Date.now() / 600);
-    spherePosition.x = 50 * Math.sin(Date.now() / 600);
-    // spherePosition.z = 50 * Math.cos(Date.now() / 600);
-    
+    if (!arm) {
+        spherePosition.y = 50 * Math.sin(Date.now() / 600);
+        spherePosition.x = 50 * Math.sin(Date.now() / 600);
+        // spherePosition.z = 50 * Math.cos(Date.now() / 600);    
+
+    }
+    else {
+        spherePosition.copy(originalSpherePosition)
+    }
     sphere.position.copy(spherePosition)
     sphere2.position.copy(spherePosition)
 
