@@ -80,20 +80,6 @@ let cubeBoundingBox
 let wirframe = false
 let drop = false
 
-//////////////////////////////////////////////////////////////////////////////
-
-// let objectCenter = new THREE.Vector3();
-
-
-// let a, b, c, d, e, f;
-
-// let nearestX, nearestY, nearestZ;
-// let currentX, currentY, currentZ;
-// let xDist, yDist, zDist;
-
-//////////////////////////////////////////////////////////////////////////////
-
-
 function setup() {
 
     // stats
@@ -631,27 +617,19 @@ function clothInitialPosition(u, v, target) {
 
 function showObject(object) {
     if (object == 'None') {
-        sphere.visible = false
         sphere2.visible = false
-        cube.visible = false
         cube2.visible = false
     }
     else if (object == 'Sphere') {
-        sphere.visible = true
         sphere2.visible = true
-        cube.visible = false
         cube2.visible = false
     }
     else if (object == 'Cube') {
-        cube.visible = true
         cube2.visible = true
-        sphere.visible = false
         sphere2.visible = false
     }
     else {
-        sphere.visible = true
         sphere2.visible = true
-        cube.visible = true
         cube2.visible = true
     }
 }
@@ -812,12 +790,12 @@ function simulate(time) {
     for (let i = 0; i < particles.length; i++) {
 
         // sphere collision handling
-        if (sphere.visible) {
+        if (sphere2.visible) {
             isParticleIntersectWithSphere(particles[i])
         }
 
         // cube collision handling
-        if (cube.visible) {
+        if (cube2.visible) {
             isParticleIntersectWithCube(particles[i], cube.position, 100, 100, 200)
         }
 
