@@ -13,6 +13,7 @@ class Cloth {
 
         let u, v;
 
+        // console.log(MASS)
         // Create particles
         for (v = 0; v <= h; v++) {
             for (u = 0; u <= w; u++) {
