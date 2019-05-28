@@ -52,6 +52,7 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let intersects
 let sphereMaterial
+let sphereMaterial2
 let cubeMaterial
 let spherePosition
 let prevBallPosition
@@ -62,15 +63,17 @@ let d
 let e
 let f
 let sphere
+let sphere2
 let object2
 let radius = 50
+let radius2 = 40
 let selected
 let clothSelected
 let mousePosition = new THREE.Vector3()
 let objects = [];
 let closestParticleIndex
 let cube
-let thing = 'Cube'
+let thing = 'Sphere'
 let moveWithMouse = false
 let cubeBoundingBox
 
@@ -209,13 +212,24 @@ function setup() {
         color: 0xe8a451,
         side: THREE.DoubleSide,
         transparent: true,
-        // opacity:0.8
+        // opacity: 0
     });
     sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     spherePosition = new THREE.Vector3(0, 0, -150);
     prevBallPosition = new THREE.Vector3(0, 0, -150);
     sphere.position.copy(spherePosition)
-    scene.add(sphere)
+    // scene.add(sphere)
+
+    let sphereGeometry2 = new THREE.SphereGeometry(radius2, 20, 20);
+    sphereMaterial2 = new THREE.MeshPhongMaterial({
+        color: 0xe8a451,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9
+    });
+    sphere2 = new THREE.Mesh(sphereGeometry2, sphereMaterial2);
+    sphere2.position.copy(spherePosition)
+    scene.add(sphere2)
 
     // var box = new THREE.BoxHelper(sphere, 0x6bcf30);
     // scene.add(box);
@@ -243,7 +257,7 @@ function setup() {
     cloth = new Cloth(clothWidth, clothHeight, fabricLength);
 
     pinCloth('OneEdge');
-    showObject('Cube')
+    showObject('Sphere')
 
     document.body.appendChild(renderer.domElement);
 
@@ -495,7 +509,7 @@ function isIntersectWithCube(particle, cubePosition, width, height, depth) {
         else if (xDist <= yDist && xDist <= zDist) {
             posNoFriction.x = nearestX;
         }
-        
+
         particle.position.copy(posNoFriction);
 
 
